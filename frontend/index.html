@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vinted Listing Optimizer</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main>
+    <h1>Nouvelle annonce</h1>
+
+    <section id="step-photos">
+      <h2>1. Photos de l'article</h2>
+      <input type="file" id="photos-input" multiple accept="image/*" />
+      <button id="btn-create-article">Créer l'article</button>
+      <p class="hint" id="article-status"></p>
+    </section>
+
+    <section id="step-images" class="disabled">
+      <h2>2. Visuels générés</h2>
+      <div class="field">
+        <label for="reference-select">Image de référence (mannequin)</label>
+        <select id="reference-select"></select>
+        <button id="btn-tryon">Générer photo mannequin</button>
+      </div>
+      <div class="field">
+        <label for="background-select">Fond de référence (optionnel)</label>
+        <select id="background-select"><option value="">— aucun —</option></select>
+        <button id="btn-flatlay">Générer photo pliée</button>
+      </div>
+      <div class="preview" id="generated-preview"></div>
+    </section>
+
+    <section id="step-info" class="disabled">
+      <h2>3. Informations article</h2>
+      <button id="btn-recognize">Pré-remplir depuis les photos (IA)</button>
+      <div class="field"><label>Type</label>
+        <select id="type-select"></select></div>
+      <div class="field"><label>Marque</label><input id="marque-input" /></div>
+      <div class="field"><label>Couleur</label><input id="couleur-input" /></div>
+      <div class="field"><label>Taille</label><input id="taille-input" /></div>
+      <div class="field"><label>État</label>
+        <select id="etat-select"></select></div>
+      <div class="field"><label>Matière</label><input id="matiere-input" /></div>
+      <div class="field"><label>Prix d'achat (€)</label><input id="prix-achat-input" type="number" step="0.01" /></div>
+      <div class="field checkbox">
+        <input type="checkbox" id="marche-checkbox" />
+        <label for="marche-checkbox">Utiliser le prix marché Vinted (scraping, peut échouer)</label>
+      </div>
+      <button id="btn-generate-listing">Générer titre / description / prix</button>
+    </section>
+
+    <section id="step-result" class="disabled">
+      <h2>4. Résultat</h2>
+      <div class="result-box">
+        <p><strong id="result-titre"></strong></p>
+        <p id="result-description"></p>
+        <p id="result-prix"></p>
+      </div>
+      <button id="btn-export">Exporter (zip images + texte)</button>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
