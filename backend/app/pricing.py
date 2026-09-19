@@ -9,6 +9,8 @@ Règle de prix (décidée le 19/09/2026) :
   champ `detail`).
 """
 
+from __future__ import annotations
+
 from datetime import date
 from pathlib import Path
 

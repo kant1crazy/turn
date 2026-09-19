@@ -12,6 +12,8 @@ Si ça échoue, l'appelant doit pouvoir retomber sur le prix d'achat +
 marge (voir pricing.py) plutôt que de bloquer toute l'annonce.
 """
 
+from __future__ import annotations
+
 import statistics
 import time
 

@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Optional
+
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -65,7 +69,7 @@ def generate_tryon(article_id: str, reference_name: str = Form(...)):
 
 
 @app.post("/api/articles/{article_id}/generate-flatlay")
-def generate_flatlay(article_id: str, background_reference_name: str | None = Form(None)):
+def generate_flatlay(article_id: str, background_reference_name: Optional[str] = Form(None)):
     photos = storage.raw_photos(article_id)
     if not photos:
         raise HTTPException(404, "Aucune photo pour cet article")

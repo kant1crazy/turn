@@ -12,6 +12,8 @@ Le rendu doit être vérifié à l'œil pour chaque annonce avant publication �
 c'est un point encore non testé avec une vraie clé API (voir README).
 """
 
+from __future__ import annotations
+
 import json
 from pathlib import Path
 
