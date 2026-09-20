@@ -159,14 +159,28 @@ document.getElementById("btn-recognize").addEventListener("click", async () => {
 });
 
 document.getElementById("btn-generate-listing").addEventListener("click", async () => {
+  const marque = document.getElementById("marque-input").value.trim();
+  const couleur = document.getElementById("couleur-input").value.trim();
+  const taille = document.getElementById("taille-input").value.trim();
+  const prixAchat = document.getElementById("prix-achat-input").value;
+
+  const manquants = [];
+  if (!marque) manquants.push("Marque");
+  if (!couleur) manquants.push("Couleur");
+  if (!taille) manquants.push("Taille");
+  if (!prixAchat || Number(prixAchat) <= 0) manquants.push("Prix d'achat");
+  if (manquants.length) {
+    return alert(`Remplis d'abord : ${manquants.join(", ")}`);
+  }
+
   const form = new FormData();
   form.append("type", document.getElementById("type-select").value);
-  form.append("marque", document.getElementById("marque-input").value);
-  form.append("couleur", document.getElementById("couleur-input").value);
-  form.append("taille", document.getElementById("taille-input").value);
+  form.append("marque", marque);
+  form.append("couleur", couleur);
+  form.append("taille", taille);
   form.append("etat", document.getElementById("etat-select").value);
   form.append("matiere", document.getElementById("matiere-input").value);
-  form.append("prix_achat", document.getElementById("prix-achat-input").value);
+  form.append("prix_achat", prixAchat);
   form.append("utiliser_prix_marche", document.getElementById("marche-checkbox").checked);
 
   const res = await fetch(`${API}/api/articles/${articleId}/listing`, { method: "POST", body: form });
