@@ -62,5 +62,26 @@ button:hover { opacity: 0.9; }
 
 .preview { display: flex; gap: 0.75rem; margin-top: 1rem; flex-wrap: wrap; }
 .preview img { max-width: 140px; border-radius: 6px; border: 1px solid var(--border); }
+.preview .thumb { position: relative; }
+.preview .thumb button {
+  position: absolute; top: -6px; right: -6px; width: 20px; height: 20px;
+  padding: 0; line-height: 1; border-radius: 50%; font-size: 0.75rem;
+}
+
+.dropzone {
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--muted);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.dropzone:hover, .dropzone.dragover {
+  border-color: var(--accent);
+  background: #f3f7f5;
+}
+.dropzone p { margin: 0; font-size: 0.9rem; }
+.dropzone-small { padding: 0.85rem; }
 
 .result-box { background: #f3f7f5; border-radius: 8px; padding: 1rem; }

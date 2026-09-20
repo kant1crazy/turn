@@ -4,6 +4,7 @@ __pycache__/
 .venv/
 venv/
 data/articles/
+data/references/
 data/*.xlsx.bak
 *.zip
 .DS_Store

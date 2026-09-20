@@ -12,13 +12,26 @@
 
     <section id="step-photos">
       <h2>1. Photos de l'article</h2>
-      <input type="file" id="photos-input" multiple accept="image/*" />
+      <div class="dropzone" id="photos-dropzone">
+        <p>Glisse tes photos ici, ou clique pour choisir</p>
+        <input type="file" id="photos-input" multiple accept="image/*" hidden />
+      </div>
+      <div class="preview" id="photos-preview"></div>
       <button id="btn-create-article">Créer l'article</button>
       <p class="hint" id="article-status"></p>
     </section>
 
     <section id="step-images" class="disabled">
       <h2>2. Visuels générés</h2>
+
+      <div class="field">
+        <label>Ajouter une image de référence (toi portant un vêtement, ou un fond)</label>
+        <div class="dropzone dropzone-small" id="reference-dropzone">
+          <p>Glisse une ou plusieurs images ici, ou clique pour choisir</p>
+          <input type="file" id="reference-input" multiple accept="image/*" hidden />
+        </div>
+      </div>
+
       <div class="field">
         <label for="reference-select">Image de référence (mannequin)</label>
         <select id="reference-select"></select>

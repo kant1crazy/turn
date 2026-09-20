@@ -4,6 +4,7 @@ const TYPES = ["Chemise", "T-shirt", "Pull", "Robe", "Pantalon", "Jean", "Jupe",
 const ETATS = ["Neuf avec étiquette", "Neuf sans étiquette", "Très bon état", "Bon état", "Satisfaisant"];
 
 let articleId = null;
+let pendingPhotoFiles = [];
 
 function fillSelect(select, values) {
   select.innerHTML = "";
@@ -18,12 +19,41 @@ function fillSelect(select, values) {
 fillSelect(document.getElementById("type-select"), TYPES);
 fillSelect(document.getElementById("etat-select"), ETATS);
 
+/**
+ * Branche une zone de glisser-déposer sur un <input type="file"> caché.
+ * `onFiles` reçoit un tableau de File à chaque dépôt ou sélection.
+ */
+function setupDropzone(dropzoneEl, inputEl, onFiles) {
+  dropzoneEl.addEventListener("click", () => inputEl.click());
+  inputEl.addEventListener("change", () => {
+    onFiles(Array.from(inputEl.files));
+    inputEl.value = "";
+  });
+  ["dragenter", "dragover"].forEach((evt) =>
+    dropzoneEl.addEventListener(evt, (e) => {
+      e.preventDefault();
+      dropzoneEl.classList.add("dragover");
+    })
+  );
+  ["dragleave", "drop"].forEach((evt) =>
+    dropzoneEl.addEventListener(evt, (e) => {
+      e.preventDefault();
+      dropzoneEl.classList.remove("dragover");
+    })
+  );
+  dropzoneEl.addEventListener("drop", (e) => {
+    const files = Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith("image/"));
+    if (files.length) onFiles(files);
+  });
+}
+
 async function loadReferences() {
   const res = await fetch(`${API}/api/references`);
   const data = await res.json();
   const refSelect = document.getElementById("reference-select");
   const bgSelect = document.getElementById("background-select");
   fillSelect(refSelect, data.references);
+  bgSelect.innerHTML = '<option value="">— aucun —</option>';
   for (const name of data.references) {
     const opt = document.createElement("option");
     opt.value = name;
@@ -33,11 +63,41 @@ async function loadReferences() {
 }
 loadReferences();
 
+// --- Étape 1 : photos de l'article (glisser-déposer, cumulatif) ---
+
+function renderPhotosPreview() {
+  const container = document.getElementById("photos-preview");
+  container.innerHTML = "";
+  pendingPhotoFiles.forEach((file, index) => {
+    const thumb = document.createElement("div");
+    thumb.className = "thumb";
+    const img = document.createElement("img");
+    img.src = URL.createObjectURL(file);
+    const removeBtn = document.createElement("button");
+    removeBtn.textContent = "×";
+    removeBtn.addEventListener("click", () => {
+      pendingPhotoFiles.splice(index, 1);
+      renderPhotosPreview();
+    });
+    thumb.appendChild(img);
+    thumb.appendChild(removeBtn);
+    container.appendChild(thumb);
+  });
+}
+
+setupDropzone(
+  document.getElementById("photos-dropzone"),
+  document.getElementById("photos-input"),
+  (files) => {
+    pendingPhotoFiles.push(...files);
+    renderPhotosPreview();
+  }
+);
+
 document.getElementById("btn-create-article").addEventListener("click", async () => {
-  const input = document.getElementById("photos-input");
-  if (!input.files.length) return;
+  if (!pendingPhotoFiles.length) return alert("Ajoute au moins une photo d'abord.");
   const form = new FormData();
-  for (const f of input.files) form.append("photos", f);
+  for (const f of pendingPhotoFiles) form.append("photos", f);
   const res = await fetch(`${API}/api/articles`, { method: "POST", body: form });
   const data = await res.json();
   articleId = data.id;
@@ -46,8 +106,24 @@ document.getElementById("btn-create-article").addEventListener("click", async ()
   document.getElementById("step-info").classList.remove("disabled");
 });
 
+// --- Étape 2 : visuels générés + upload direct d'images de référence ---
+
+setupDropzone(
+  document.getElementById("reference-dropzone"),
+  document.getElementById("reference-input"),
+  async (files) => {
+    for (const file of files) {
+      const form = new FormData();
+      form.append("photo", file);
+      await fetch(`${API}/api/references`, { method: "POST", body: form });
+    }
+    await loadReferences();
+  }
+);
+
 document.getElementById("btn-tryon").addEventListener("click", async () => {
   const referenceName = document.getElementById("reference-select").value;
+  if (!referenceName) return alert("Ajoute d'abord une image de référence.");
   const form = new FormData();
   form.append("reference_name", referenceName);
   const res = await fetch(`${API}/api/articles/${articleId}/generate-tryon`, { method: "POST", body: form });
