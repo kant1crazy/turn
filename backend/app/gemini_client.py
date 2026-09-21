@@ -14,11 +14,13 @@ c'est un point encore non testé avec une vraie clé API (voir README).
 
 from __future__ import annotations
 
+import io
 import json
 from pathlib import Path
 
 from google import genai
 from google.genai import types
+from PIL import Image, ImageOps
 
 from . import config
 from .models import ArticleInfo, ListingText
@@ -39,8 +41,21 @@ def _get_client() -> genai.Client:
 
 
 def _image_part(path: Path) -> types.Part:
-    mime = "image/png" if path.suffix.lower() == ".png" else "image/jpeg"
-    return types.Part.from_bytes(data=path.read_bytes(), mime_type=mime)
+    """Charge une image et corrige sa rotation EXIF avant de l'envoyer à Gemini.
+
+    Les photos prises au téléphone stockent souvent la rotation dans les
+    métadonnées EXIF sans faire pivoter les pixels eux-mêmes ; envoyées
+    telles quelles, Gemini les reçoit de travers et ignore la pose/le
+    vêtement de référence. On applique la rotation puis on la fige dans les
+    pixels (PNG, sans EXIF).
+    """
+    image = Image.open(path)
+    image = ImageOps.exif_transpose(image)
+    if image.mode not in ("RGB", "RGBA"):
+        image = image.convert("RGB")
+    buffer = io.BytesIO()
+    image.save(buffer, format="PNG")
+    return types.Part.from_bytes(data=buffer.getvalue(), mime_type="image/png")
 
 
 def _first_image_bytes(response) -> bytes:
