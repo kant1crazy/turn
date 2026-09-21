@@ -60,6 +60,19 @@ scripts/generate_excel_template.py   régénère data/articles.xlsx si besoin
 
 ## Mise en route
 
+**Le plus simple : double-clique sur `Lancer.command`** à la racine du
+projet. Il installe l'environnement Python au premier lancement, crée
+`.env` s'il n'existe pas encore (pense à y ajouter ta `GEMINI_API_KEY`),
+démarre le serveur et ouvre l'appli dans ton navigateur. Laisse la fenêtre
+de terminal ouverte tant que tu utilises l'appli ; la refermer arrête le
+serveur. Si tu double-cliques dessus alors que le serveur tourne déjà, il
+se contente de rouvrir l'appli sans rien casser.
+
+(Au tout premier lancement, macOS peut demander de confirmer l'ouverture
+d'un fichier venant d'un développeur non identifié : fais un clic droit
+dessus → *Ouvrir*, une seule fois.)
+
+Manuellement, si tu préfères garder la main :
 ```bash
 cd backend
 pip install -r requirements.txt
