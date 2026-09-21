@@ -58,6 +58,9 @@ async function withLoading(button, loadingText, task) {
   button.textContent = loadingText;
   try {
     return await task();
+  } catch (err) {
+    console.error(err);
+    alert(`Erreur inattendue : ${err.message}\n(voir la console du navigateur et le terminal du serveur pour le détail)`);
   } finally {
     button.disabled = false;
     button.classList.remove("loading");
