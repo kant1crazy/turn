@@ -3,7 +3,16 @@
 # (si besoin) et ouvre la page dans ton navigateur. Laisse cette fenêtre
 # de terminal ouverte tant que tu utilises l'appli.
 
-cd "$(dirname "$0")/backend"
+cd "$(dirname "$0")"
+
+echo "Récupération des dernières mises à jour..."
+if ! git pull --ff-only 2>/tmp/lancer_git_pull.log; then
+  echo "⚠️  Impossible de mettre à jour automatiquement (pas de réseau, ou modifs locales en conflit)."
+  echo "   On continue avec la version déjà présente sur ce Mac."
+  cat /tmp/lancer_git_pull.log
+fi
+
+cd backend
 
 if lsof -i :8000 -sTCP:LISTEN -t >/dev/null 2>&1; then
   echo "Le serveur tourne déjà, ouverture de l'appli..."
