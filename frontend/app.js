@@ -5,6 +5,8 @@ const ETATS = ["Neuf avec étiquette", "Neuf sans étiquette", "Très bon état"
 
 let articleId = null;
 let pendingPhotoFiles = [];
+let selectedReference = null;
+let selectedBackground = null; // null = pas de fond de référence
 
 function fillSelect(select, values) {
   select.innerHTML = "";
@@ -68,19 +70,67 @@ async function withLoading(button, loadingText, task) {
   }
 }
 
-async function loadReferences() {
+/**
+ * Construit une galerie de miniatures cliquables dans `container` à partir
+ * de `names` (fichiers dans data/references/). `onSelect(name)` est appelé
+ * au clic ; la miniature dont le nom vaut `selected` est mise en surbrillance.
+ * `includeNone`, si fourni, ajoute une tuile "aucun" en tête (valeur null).
+ */
+function renderGallery(container, names, selected, onSelect, includeNone) {
+  container.innerHTML = "";
+
+  if (includeNone) {
+    const noneTile = document.createElement("div");
+    noneTile.className = "ref-thumb ref-thumb-none" + (selected === null ? " selected" : "");
+    noneTile.textContent = "Aucun";
+    noneTile.addEventListener("click", () => onSelect(null));
+    container.appendChild(noneTile);
+  }
+
+  for (const name of names) {
+    const tile = document.createElement("div");
+    tile.className = "ref-thumb" + (name === selected ? " selected" : "");
+    const img = document.createElement("img");
+    img.src = `${API}/data/references/${encodeURIComponent(name)}`;
+    tile.appendChild(img);
+    tile.addEventListener("click", () => onSelect(name));
+    container.appendChild(tile);
+  }
+}
+
+function renderReferenceGalleries() {
+  renderGallery(
+    document.getElementById("reference-gallery"),
+    lastReferenceNames,
+    selectedReference,
+    (name) => {
+      selectedReference = name;
+      renderReferenceGalleries();
+    },
+    false
+  );
+  renderGallery(
+    document.getElementById("background-gallery"),
+    lastReferenceNames,
+    selectedBackground,
+    (name) => {
+      selectedBackground = name;
+      renderReferenceGalleries();
+    },
+    true
+  );
+}
+
+let lastReferenceNames = [];
+
+async function loadReferences({ selectLatest } = {}) {
   const res = await fetch(`${API}/api/references`);
   const data = await res.json();
-  const refSelect = document.getElementById("reference-select");
-  const bgSelect = document.getElementById("background-select");
-  fillSelect(refSelect, data.references);
-  bgSelect.innerHTML = '<option value="">— aucun —</option>';
-  for (const name of data.references) {
-    const opt = document.createElement("option");
-    opt.value = name;
-    opt.textContent = name;
-    bgSelect.appendChild(opt);
+  lastReferenceNames = data.references;
+  if (selectLatest && lastReferenceNames.length) {
+    selectedReference = lastReferenceNames[lastReferenceNames.length - 1];
   }
+  renderReferenceGalleries();
 }
 loadReferences();
 
@@ -138,16 +188,15 @@ setupDropzone(
       form.append("photo", file);
       await fetch(`${API}/api/references`, { method: "POST", body: form });
     }
-    await loadReferences();
+    await loadReferences({ selectLatest: true });
   }
 );
 
 document.getElementById("btn-tryon").addEventListener("click", async (e) => {
-  const referenceName = document.getElementById("reference-select").value;
-  if (!referenceName) return alert("Ajoute d'abord une image de référence.");
+  if (!selectedReference) return alert("Choisis d'abord une photo de référence.");
   await withLoading(e.target, "Génération en cours…", async () => {
     const form = new FormData();
-    form.append("reference_name", referenceName);
+    form.append("reference_name", selectedReference);
     const res = await fetch(`${API}/api/articles/${articleId}/generate-tryon`, { method: "POST", body: form });
     if (!res.ok) return alert("Échec génération mannequin : " + (await res.text()));
     const data = await res.json();
@@ -157,9 +206,8 @@ document.getElementById("btn-tryon").addEventListener("click", async (e) => {
 
 document.getElementById("btn-flatlay").addEventListener("click", async (e) => {
   await withLoading(e.target, "Génération en cours…", async () => {
-    const bg = document.getElementById("background-select").value;
     const form = new FormData();
-    if (bg) form.append("background_reference_name", bg);
+    if (selectedBackground) form.append("background_reference_name", selectedBackground);
     const res = await fetch(`${API}/api/articles/${articleId}/generate-flatlay`, { method: "POST", body: form });
     if (!res.ok) return alert("Échec génération photo pliée : " + (await res.text()));
     const data = await res.json();
