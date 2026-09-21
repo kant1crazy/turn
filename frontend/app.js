@@ -47,6 +47,24 @@ function setupDropzone(dropzoneEl, inputEl, onFiles) {
   });
 }
 
+/**
+ * Désactive le bouton et affiche un texte de chargement pendant `task()`,
+ * puis restaure son état d'origine (y compris en cas d'erreur).
+ */
+async function withLoading(button, loadingText, task) {
+  const original = button.textContent;
+  button.disabled = true;
+  button.classList.add("loading");
+  button.textContent = loadingText;
+  try {
+    return await task();
+  } finally {
+    button.disabled = false;
+    button.classList.remove("loading");
+    button.textContent = original;
+  }
+}
+
 async function loadReferences() {
   const res = await fetch(`${API}/api/references`);
   const data = await res.json();
@@ -121,25 +139,29 @@ setupDropzone(
   }
 );
 
-document.getElementById("btn-tryon").addEventListener("click", async () => {
+document.getElementById("btn-tryon").addEventListener("click", async (e) => {
   const referenceName = document.getElementById("reference-select").value;
   if (!referenceName) return alert("Ajoute d'abord une image de référence.");
-  const form = new FormData();
-  form.append("reference_name", referenceName);
-  const res = await fetch(`${API}/api/articles/${articleId}/generate-tryon`, { method: "POST", body: form });
-  if (!res.ok) return alert("Échec génération mannequin : " + (await res.text()));
-  const data = await res.json();
-  addPreview(data.path);
+  await withLoading(e.target, "Génération en cours…", async () => {
+    const form = new FormData();
+    form.append("reference_name", referenceName);
+    const res = await fetch(`${API}/api/articles/${articleId}/generate-tryon`, { method: "POST", body: form });
+    if (!res.ok) return alert("Échec génération mannequin : " + (await res.text()));
+    const data = await res.json();
+    addPreview(data.path);
+  });
 });
 
-document.getElementById("btn-flatlay").addEventListener("click", async () => {
-  const bg = document.getElementById("background-select").value;
-  const form = new FormData();
-  if (bg) form.append("background_reference_name", bg);
-  const res = await fetch(`${API}/api/articles/${articleId}/generate-flatlay`, { method: "POST", body: form });
-  if (!res.ok) return alert("Échec génération photo pliée : " + (await res.text()));
-  const data = await res.json();
-  addPreview(data.path);
+document.getElementById("btn-flatlay").addEventListener("click", async (e) => {
+  await withLoading(e.target, "Génération en cours…", async () => {
+    const bg = document.getElementById("background-select").value;
+    const form = new FormData();
+    if (bg) form.append("background_reference_name", bg);
+    const res = await fetch(`${API}/api/articles/${articleId}/generate-flatlay`, { method: "POST", body: form });
+    if (!res.ok) return alert("Échec génération photo pliée : " + (await res.text()));
+    const data = await res.json();
+    addPreview(data.path);
+  });
 });
 
 function addPreview(relativePath) {
@@ -148,17 +170,19 @@ function addPreview(relativePath) {
   document.getElementById("generated-preview").appendChild(img);
 }
 
-document.getElementById("btn-recognize").addEventListener("click", async () => {
-  const res = await fetch(`${API}/api/articles/${articleId}/recognize`, { method: "POST" });
-  if (!res.ok) return alert("Échec reconnaissance : " + (await res.text()));
-  const data = await res.json();
-  if (data.marque) document.getElementById("marque-input").value = data.marque;
-  if (data.type) document.getElementById("type-select").value = data.type;
-  if (data.couleur) document.getElementById("couleur-input").value = data.couleur;
-  if (data.matiere) document.getElementById("matiere-input").value = data.matiere;
+document.getElementById("btn-recognize").addEventListener("click", async (e) => {
+  await withLoading(e.target, "Analyse en cours…", async () => {
+    const res = await fetch(`${API}/api/articles/${articleId}/recognize`, { method: "POST" });
+    if (!res.ok) return alert("Échec reconnaissance : " + (await res.text()));
+    const data = await res.json();
+    if (data.marque) document.getElementById("marque-input").value = data.marque;
+    if (data.type) document.getElementById("type-select").value = data.type;
+    if (data.couleur) document.getElementById("couleur-input").value = data.couleur;
+    if (data.matiere) document.getElementById("matiere-input").value = data.matiere;
+  });
 });
 
-document.getElementById("btn-generate-listing").addEventListener("click", async () => {
+document.getElementById("btn-generate-listing").addEventListener("click", async (e) => {
   const marque = document.getElementById("marque-input").value.trim();
   const couleur = document.getElementById("couleur-input").value.trim();
   const taille = document.getElementById("taille-input").value.trim();
@@ -173,23 +197,25 @@ document.getElementById("btn-generate-listing").addEventListener("click", async 
     return alert(`Remplis d'abord : ${manquants.join(", ")}`);
   }
 
-  const form = new FormData();
-  form.append("type", document.getElementById("type-select").value);
-  form.append("marque", marque);
-  form.append("couleur", couleur);
-  form.append("taille", taille);
-  form.append("etat", document.getElementById("etat-select").value);
-  form.append("matiere", document.getElementById("matiere-input").value);
-  form.append("prix_achat", prixAchat);
-  form.append("utiliser_prix_marche", document.getElementById("marche-checkbox").checked);
+  await withLoading(e.target, "Génération en cours…", async () => {
+    const form = new FormData();
+    form.append("type", document.getElementById("type-select").value);
+    form.append("marque", marque);
+    form.append("couleur", couleur);
+    form.append("taille", taille);
+    form.append("etat", document.getElementById("etat-select").value);
+    form.append("matiere", document.getElementById("matiere-input").value);
+    form.append("prix_achat", prixAchat);
+    form.append("utiliser_prix_marche", document.getElementById("marche-checkbox").checked);
 
-  const res = await fetch(`${API}/api/articles/${articleId}/listing`, { method: "POST", body: form });
-  if (!res.ok) return alert("Échec génération annonce : " + (await res.text()));
-  const data = await res.json();
-  document.getElementById("result-titre").textContent = data.listing.titre;
-  document.getElementById("result-description").textContent = data.listing.description;
-  document.getElementById("result-prix").textContent = `Prix conseillé : ${data.price.prix_conseille} € — ${data.price.detail}`;
-  document.getElementById("step-result").classList.remove("disabled");
+    const res = await fetch(`${API}/api/articles/${articleId}/listing`, { method: "POST", body: form });
+    if (!res.ok) return alert("Échec génération annonce : " + (await res.text()));
+    const data = await res.json();
+    document.getElementById("result-titre").textContent = data.listing.titre;
+    document.getElementById("result-description").textContent = data.listing.description;
+    document.getElementById("result-prix").textContent = `Prix conseillé : ${data.price.prix_conseille} € — ${data.price.detail}`;
+    document.getElementById("step-result").classList.remove("disabled");
+  });
 });
 
 document.getElementById("btn-export").addEventListener("click", () => {

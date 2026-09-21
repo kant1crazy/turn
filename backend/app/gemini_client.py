@@ -53,14 +53,14 @@ def _first_image_bytes(response) -> bytes:
 def generate_tryon_image(reference_path: Path, product_photo_paths: list[Path]) -> bytes:
     """Habille le mannequin de `reference_path` avec l'article des photos produit."""
     prompt = (
-        "Voici une photo de référence d'une personne (pose, corps, fond) et des "
-        "photos d'un vêtement à vendre. Génère une nouvelle image où la personne "
-        "de la photo de référence porte exactement ce vêtement, à la place du "
-        "sien. Garde la pose, le corps et le fond de la photo de référence "
-        "identiques. Le vêtement doit conserver EXACTEMENT sa couleur, sa "
-        "texture, son motif et ses proportions tels que vus sur les photos "
-        "produit — ne réinvente ni la couleur ni le tissu. N'ajoute aucun "
-        "logo ou détail qui n'est pas visible sur les photos produit."
+        "Utilise la première image comme référence pour le personnage (même "
+        "visage, même carnation, même corpulence, mêmes accessoires comme la "
+        "montre) et les images suivantes comme référence pour le vêtement. "
+        "Remplace le vêtement porté par la personne de la première image par "
+        "celui des images suivantes, en respectant fidèlement sa couleur, ses "
+        "motifs, sa coupe et sa texture. Garde le même décor et le même "
+        "éclairage que la première image. Le rendu doit être photoréaliste, "
+        "sans déformation du tissu, sans aspect \"généré par IA\"."
     )
     parts = [prompt, _image_part(reference_path)] + [_image_part(p) for p in product_photo_paths]
     response = _get_client().models.generate_content(model=IMAGE_MODEL, contents=parts)
