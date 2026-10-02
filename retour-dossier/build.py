@@ -65,6 +65,22 @@ def fixes(rows):
     return "".join(out)
 
 
+def pagetext(pid, rows, note=None):
+    """rows : (étiquette, texte ou liste de paragraphes). L'étiquette « À retenir » prend le style sélection."""
+    out = [f'<div class="ptext"><header><span>Texte de la page, prêt à coller</span>'
+           f'<button type="button" class="copy" data-target="pt-{pid}">Copier</button></header>'
+           f'<dl class="copy-src" id="pt-{pid}">']
+    for lab, val in rows:
+        paras = val if isinstance(val, list) else [val]
+        cls = ' class="rt"' if lab == "À retenir" else ""
+        out.append(f'<div{cls}><dt>{t(lab)}</dt><dd>' + "".join(f"<p>{t(x)}</p>" for x in paras) + "</dd></div>")
+    out.append("</dl>")
+    if note:
+        out.append(f'<p class="hint">{t(note)}</p>')
+    out.append("</div>")
+    return "".join(out)
+
+
 DENS = {
     "empty": "Trop vide",
     "unbal": "Déséquilibrée",
@@ -91,15 +107,18 @@ def card(c):
     notes = []
     if c.get("src"):
         notes.append(f'<p class="src"><span class="lbl">Contenu</span>{t(c["src"])}</p>')
+    if c.get("ptext"):
+        notes.append(pagetext(c["id"], c["ptext"], c.get("ptext_note")))
     if c.get("works"):
         notes.append("<h4>Ce qui marche</h4>" + ul(c["works"], "plus"))
     if c.get("todo"):
-        notes.append("<h4>" + ("À faire" if kind == "exist" else "Ce que la page doit contenir") + "</h4>" + ul(c["todo"], "todo"))
+        notes.append("<h4>" + ("À faire" if kind == "exist" else ("Mise en page" if c.get("ptext") else "Ce que la page doit contenir")) + "</h4>" + ul(c["todo"], "todo"))
     if c.get("extra"):
         notes.append(c["extra"])
     if c.get("fixes"):
         notes.append("<h4>Corrections</h4>" + fixes(c["fixes"]))
-    notes.append(keep(c.get("keep")))
+    if not c.get("ptext"):
+        notes.append(keep(c.get("keep")))
     return (
         f'<article class="pg {kind}" id="{c["id"]}">'
         f'<header class="pg-head"><span class="ref">{c["ref"]}</span><h3>{t(c["title"])}</h3><div class="chips">{chips}</div></header>'
@@ -471,11 +490,11 @@ CARDS.append(dict(
     wf=[("ti", 1, 6, 1, 2, "Marché de vente"), ("nu", 1, 6, 3, 2, "4,1 Md€ · 790 M€ · 20,26 Md$"), ("gr", 1, 6, 5, 2, "−1,7 % ↘  vs  ↗ +7,7 %/an"),
         ("lb", 1, 6, 7, 1, "Sources et années"), ("rt", 1, 6, 8, 1, "À retenir"), ("im", 8, 5, 2, 6, "Photo + légende « contre-modèle »")], folio="13"))
 
-CARDS.append(("beat", ("4", "Catalyst", "Pourquoi maintenant ?", "2 pages", "Manquant, mais tout le contenu existe : le 2e paragraphe de la p. 3 et vos notes sur les matériaux du luminaire.")))
+CARDS.append(("beat", ("4", "Catalyst", "Pourquoi maintenant ?", "2 pages", "Manquant dans le PDF. Le texte des deux pages est rédigé ci-dessous, prêt à coller : il reprend le 2e paragraphe de la p. 3 et vos notes sur les matériaux du luminaire.")))
 CARDS.append(dict(
     id="cat1", kind="new", ref="Nouvelle", title="Le brûlage n'est plus une option",
     chips=[("new", "Contenu prêt")],
-    src="2e paragraphe de la p. 3 (déplacé) + « pression citoyenne » de la p. 5.",
+    src="2e paragraphe de la p. 3 (déplacé), complété par les alternatives de la p. 4.",
     todo=["Un chiffre choc en très grand : <b>130 000 voitures par jour</b> (4 300 à 5 500 t de bois de vigne brûlées en trois mois).",
           "Le cadre : circulaire du 18 novembre 2011, zones forestières de Gironde, pression citoyenne.",
           "Nommer l'association qui a fait le calcul (source en pied de page).",
@@ -609,6 +628,90 @@ CARDS.append(dict(
           "Toutlevin.com (« La surprenante seconde vie de la vigne et du raisin ») ; sites de Vitis Valorem, Les Princes Sarments, Niko & Co.",
           "Format : auteur ou organisme, titre, date, lien. Et une ligne de source en pied de chaque page chiffrée."],
     wf=[("ti", 1, 4, 1, 1, "Sources"), ("li", 1, 6, 2, 6, "Chiffres & études"), ("li", 7, 6, 2, 6, "Sites & entreprises")], head="▶ ANNEXES", folio="60"))
+
+
+PTEXT = {
+    "brief": [
+        ("Titre", "Brief"),
+        ("La demande", "Créer une marque produit à partir d'une matière première en seconde vie."),
+        ("Le projet", "Atelier Sarment (nom provisoire) transforme le sarment de vigne, coproduit brûlé ou broyé chaque hiver, en luminaires artisanaux. Le sarment est conservé entier et tracé jusqu'à son domaine d'origine, en Nouvelle-Aquitaine."),
+        ("Les attentes", "Une plateforme de marque, une identité visuelle (logo, charte graphique) et ses déclinaisons : étiquette de traçabilité, packaging, réseaux sociaux, site."),
+    ],
+    "usages": [
+        ("Titre", "Usages actuels du sarment"),
+        ("Chapeau", "Avec environ deux tonnes par hectare et par an, la ressource est massive et récurrente. Elle part aujourd'hui dans quatre directions."),
+        ("Retour au sol", "C'est l'usage majoritaire : le sarment est broyé et laissé dans les rangs. Certains experts jugent ces 2 tonnes restituées comme un minimum pour entretenir la vie du sol."),
+        ("Brûlage", "Encore souvent pratiqué à l'air libre, il génère une fumée polluante. La réglementation se durcit dans les régions où il était traditionnel."),
+        ("Énergie et compost", "Transformation en pellets, en biogaz ou en compost."),
+        ("Matériaux", "Vitis Valorem en est le pionnier : l'entreprise collecte en moyenne 300 hectares de sarments et de ceps par an, de novembre à mars, pour fabriquer des tuteurs, des piquets et des agrafes. Elle prévoit de s'étendre à la cosmétique, à l'automobile et au bâtiment."),
+        ("Source", "Toutlevin.com, « La surprenante seconde vie de la vigne et du raisin »."),
+        ("À retenir", "Aucun usage actuel ne conserve le sarment dans sa forme d'origine : il est broyé, brûlé ou composté."),
+    ],
+    "cat1": [
+        ("Sur-titre", "Pourquoi maintenant ?"),
+        ("Titre", "Le brûlage n'est plus une option"),
+        ("Chiffre clé", "130 000 voitures par jour"),
+        ("Légende du chiffre", "C'est la pollution équivalente aux 4 300 à 5 500 tonnes de bois de vigne brûlées en trois mois en Gironde, selon une association environnementale."),
+        ("Texte", [
+            "En Gironde, premier vignoble de Nouvelle-Aquitaine, le brûlage à l'air libre des déchets verts viticoles est interdit ou fortement encadré dans les zones à dominante forestière. Le cadre réglementaire de référence est la circulaire du 18 novembre 2011, qui interdit le brûlage à l'air libre des déchets verts à l'échelle nationale.",
+            "La pression s'est accentuée à la suite d'épisodes de brûlage de 4 300 à 5 500 tonnes de bois de vigne en trois mois, une pratique dénoncée par une association environnementale comme équivalente à la pollution de 130 000 voitures ou 24 000 camions par jour.",
+            "Les alternatives recommandées (broyage, compostage, paillage, déchèterie) ne valorisent pas économiquement la matière. Les vignerons cherchent donc surtout à se débarrasser proprement de leurs sarments.",
+        ]),
+        ("Source", "Circulaire du 18 novembre 2011 ; [nom de l'association environnementale] ; F.G.V.B."),
+        ("À retenir", "Brûler n'est plus possible, broyer ne rapporte rien : les vignerons ont besoin d'un débouché."),
+    ],
+    "cat2": [
+        ("Sur-titre", "Pourquoi maintenant ?"),
+        ("Titre", "Le luminaire cherche d'autres matières"),
+        ("Chapeau", "Le luminaire d'aujourd'hui repose surtout sur des matériaux énergivores ou d'origine fossile."),
+        ("Métal", "Acier, aluminium, laiton : très courants pour les pieds et les structures. L'aluminium neuf est particulièrement énergivore à produire."),
+        ("Plastiques", "ABS, polycarbonate, polypropylène : dominants dans l'entrée de gamme, d'origine fossile et peu recyclés."),
+        ("Verre et céramique", "Cuits à haute température, donc énergivores."),
+        ("Fibres naturelles", "Bois, rotin, osier, papier, tissu : surtout pour les abat-jour et les modèles « naturels »."),
+        ("Encadré", ["Recycler le sarment, c'est :", "du temps gagné pour les vignerons ;", "un engagement fort pour l'environnement ;", "moins de CO₂ ;", "pas de fumée toxique ;", "moins de risques d'incendie."]),
+        ("Phrase de lien", "Et la demande suit : le luminaire haut de gamme progresse de plus de 7,7 % par an dans le monde, et les fabricants misent sur les matériaux durables pour se repositionner."),
+        ("Source", "Vos notes ; chiffres du marché : voir p. 9 (Syndicat du luminaire, étude de marché haut de gamme)."),
+        ("À retenir", "La contrainte crée le besoin (le brûlage recule), la tendance crée la demande (matériaux durables) : c'est le bon moment."),
+    ],
+    "synth": [
+        ("Titre", "Synthèse de l'analyse"),
+        ("Texte", [
+            "La viticulture française génère plus de 2 tonnes de sarments par hectare et par an, une biomasse aujourd'hui très peu valorisée (broyage-épandage majoritaire, brûlage en recul sous la pression réglementaire). En Gironde, l'encadrement croissant du brûlage pousse les domaines à chercher activement des débouchés, ce qui rend la matière première accessible gratuitement ou à faible coût.",
+            "Le secteur reste peu structuré : ce n'est pas un marché organisé avec acheteurs et vendeurs, mais une gestion de déchet agricole en quête de valorisation. Trois types d'acteurs comparables existent : Niko & Co (Charente), artisanal, sur piquets de vigne et plusieurs essences de bois ; Les Princes Sarments, matériau composite haut de gamme pour l'architecture de luxe ; Vitis Valorem, filière B2B nationale multisecteur. Aucun n'occupe le segment précis du luminaire en sarment brut avec traçabilité du domaine d'origine en Nouvelle-Aquitaine : c'est l'espace de différenciation identifié pour ce projet.",
+            "L'analyse PESTELÉ confirme un contexte favorable : une dynamique réglementaire et institutionnelle favorable à l'économie circulaire, une sensibilité sociétale à l'upcycling et à la pollution du brûlage. Elle signale aussi des points de vigilance éthiques : risque de greenwashing, équité de valeur avec les vignerons fournisseurs, transparence sur la traçabilité annoncée.",
+        ]),
+        ("À retenir", "Aucun acteur n'occupe le luminaire en sarment brut, tracé jusqu'au domaine, en Nouvelle-Aquitaine."),
+    ],
+    "concept": [
+        ("Titre", "Le sarment reste sarment"),
+        ("Texte", "On ne dénature pas le sarment. Là où les autres entreprises le broient pour l'utiliser en brisures, nous le conservons dans sa structure naturelle, en y ajoutant des courbes organiques pour le sublimer. Nous mettons en valeur ce qui est habituellement broyé ou brûlé."),
+        ("Légende photo gauche", "Ce que font les autres : le sarment broyé, réduit en brisures."),
+        ("Légende photo droite", "Ce que nous faisons : le sarment entier, cintré, reconnaissable."),
+        ("À retenir", "Là où les autres broient le sarment, nous le gardons entier."),
+    ],
+    "process": [
+        ("Titre", "De la vigne à la lampe"),
+        ("1. Récolter", "Choisir des sarments encore souples (récolte hivernale, juste après la taille) et épais, pour la structure."),
+        ("2. Nettoyer et traiter", "Brosser pour enlever la terre et l'écorce abîmée. Faire tremper ou passer à l'autoclave (traitement anti-insectes) pour que le bois dure en intérieur. Un léger ponçage des nœuds évite les échardes sur les zones de préhension."),
+        ("3. Cintrer et sécher", "Pour les formes courbes, cintrer les sarments encore verts autour d'un gabarit et laisser sécher plusieurs semaines : le bois garde la forme. Pour un usage droit, un séchage à l'air libre de 3 à 6 mois suffit."),
+        ("4. Façonner le pied", "[À compléter : assemblage, fixation de la douille, passage du câble, socle, abat-jour.]"),
+        ("5. Tracer", "Chaque pied reçoit une étiquette : domaine, cépage, saison de taille."),
+        ("Encadré partenaire", "Un partenariat avec un vannier ou un sculpteur sur bois apporte la technique d'exécution et montre une vraie réflexion sur le mode de production."),
+        ("Preuve de faisabilité", "Niko & Co, jeune entreprise charentaise, transforme déjà des piquets de vigne en mobilier design vendu aux particuliers et aux professionnels."),
+        ("À retenir", "Un procédé simple et sans broyage : récolter, nettoyer, cintrer, sécher, assembler."),
+    ],
+}
+PTEXT_NOTE = {
+    "cat1": "Remplacez [nom de l'association] par la source exacte. Le 3e paragraphe reprend la p. 4 : supprimez-le de la p. 4 si vous le gardez ici.",
+    "cat2": "« Recycler » est le mot de vos notes ; « valoriser » serait plus juste, puisque le sarment n'est pas transformé en nouvelle matière.",
+    "synth": "Quand vos 6 fiches concurrents seront faites, remplacez « Trois types d'acteurs » par « Six acteurs » et ajoutez les trois nouveaux.",
+    "process": "L'étape 5 est un ajout, cohérent avec votre valeur « traçabilité ». L'étape 4 reste à écrire.",
+}
+for _c in CARDS:
+    if isinstance(_c, dict) and _c["id"] in PTEXT:
+        _c["ptext"] = PTEXT[_c["id"]]
+        if _c["id"] in PTEXT_NOTE:
+            _c["ptext_note"] = PTEXT_NOTE[_c["id"]]
 
 
 def render_cards():
@@ -1263,6 +1366,20 @@ ul.todo li::before,.pg-notes ul:not(.plus) li::before{{content:"→";position:ab
 .persona dt{{font:500 11px/1.5 var(--f-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}}
 .persona dd{{margin:0}}
 
+/* texte de page prêt à coller */
+.ptext{{border:1px solid var(--ink);margin:4px 0 6px}}
+.ptext header{{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 12px;border-bottom:1px solid var(--ink)}}
+.ptext header span{{font:500 11px/1.3 var(--f-mono);letter-spacing:.08em;text-transform:uppercase}}
+.ptext dl{{margin:0;padding:4px 12px 10px;display:grid;gap:0;font:400 16px/1.5 var(--f-display);max-width:none}}
+.ptext dl div{{display:grid;grid-template-columns:118px minmax(0,1fr);gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}}
+.ptext dl div:last-child{{border-bottom:0}}
+.ptext dt{{font:500 10.5px/1.6 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}}
+.ptext dd{{margin:0;display:grid;gap:6px;min-width:0}}
+.ptext dl div.rt{{background:var(--sel);color:var(--sel-ink);margin:6px -12px 0;padding:10px 12px;border-bottom:0}}
+.ptext dl div.rt dt{{color:var(--sel-ink);opacity:.8}}
+.ptext .hint{{padding:0 12px 10px}}
+@media (max-width:560px){{ .ptext dl div{{grid-template-columns:minmax(0,1fr);gap:2px}} }}
+
 /* textes corrigés */
 .txts{{display:grid;gap:18px}}
 .txt{{border:1px solid var(--line)}}
@@ -1418,7 +1535,7 @@ ul.todo li::before,.pg-notes ul:not(.plus) li::before{{content:"→";position:ab
     btn.addEventListener('click', function(){{
       var el = document.getElementById(btn.getAttribute('data-target'));
       if (!el) return;
-      var text = Array.prototype.map.call(el.querySelectorAll('p'), function(p){{ return p.innerText; }}).join('\\n');
+      var text = Array.prototype.map.call(el.querySelectorAll('p'), function(p){{ return p.innerText; }}).join(el.tagName === 'DL' ? '\\n\\n' : '\\n');
       var done = function(){{ btn.textContent = 'Copié'; setTimeout(function(){{ btn.textContent = 'Copier'; }}, 1800); }};
       var fallback = function(){{
         var r = document.createRange(); r.selectNodeContents(el);
