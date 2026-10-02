@@ -163,7 +163,7 @@ async function buildPDF(pids, opts, progress) {
         setFill(pdf, cssColorToRgba(getComputedStyle(tri).borderLeftColor) || [20, 20, 20]);
         pdf.triangle(MM(x), MM(y), MM(x), MM(y + r.height), MM(x + r.width), MM(y + r.height / 2), 'F');
       }
-      for (const rl of chrome.querySelectorAll('.ch-rule')) {
+      for (const rl of chrome.querySelectorAll('.ch-rule')) { // (anciens filets, plus utilisés)
         const r = rl.getBoundingClientRect();
         setFill(pdf, cssColorToRgba(getComputedStyle(rl).backgroundColor) || [225, 223, 218]);
         pdf.rect(MM(r.left - ctx.pr.left), MM(r.top - ctx.pr.top), MM(r.width), MM(r.height), 'F');
@@ -454,7 +454,7 @@ function chooseFam(famKey, bold, ital, cp) {
     const ik = 'i' + (bold ? '6' : '4'), nk = 'n' + (bold ? '6' : '4');
     const key = ital && F.files[ik] ? ik : (F.files[nk] ? nk : 'n4');
     const file = F.files[key];
-    if (file && covers(file, cp)) return { id: fk + key, fam: fk, pdf: F.pdf, style: PDFSTYLE[key] };
+    if (file && covers(file, cp)) return { id: fk + key, fam: fk, key, pdf: F.pdf, style: PDFSTYLE[key] };
   }
   return null;
 }
@@ -508,7 +508,8 @@ function emitRun(ctx, run) {
   pdf.setFontSize(run.fs * PT_PER_PX);
   pdf.setTextColor(run.col[0], run.col[1], run.col[2]);
   const str = run.up ? run.text.toLocaleUpperCase('fr-FR') : run.text;
-  const base = run.top + FAM[run.f.fam].asc * run.fs;
+  const F = FAM[run.f.fam];
+  const base = run.top + (F.ascK[run.f.key] || F.asc) * run.fs;
   // le PDF n'applique pas le crénage : on recale l'approche pour retrouver la largeur mesurée à l'écran
   let cs = run.ls ? MM(run.ls) : 0;
   const n = [...str].length;

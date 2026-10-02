@@ -504,16 +504,19 @@ function openProject() {
 /* ---------------------------------------------------------------- mise à jour du modèle
    Les pages du modèle d'origine que personne n'a touchées passent au nouveau style ;
    les pages modifiées restent telles quelles. */
+function isTemplatePage(p) {
+  const sig = pageSig(p);
+  if (p.tplSig) return sig === p.tplSig;
+  return V2SIG[p.name] === sig || V1SIG[p.name] === sig;
+}
 function templateUpdatePlan() {
   const fresh = buildDossier();
   const byName = new Map(fresh.pages.map(p => [p.name, p]));
   const same = [], changed = [];
   for (const id of S.meta.order) {
     const p = S.pages.get(id);
-    if (!p) continue;
-    const ref = V1SIG[p.name];
-    if (!ref) continue;
-    if (ref === pageSig(p) && byName.has(p.name)) same.push(p); else changed.push(p);
+    if (!p || !byName.has(p.name)) continue;
+    if (isTemplatePage(p)) same.push(p); else changed.push(p);
   }
   return { same, changed, byName };
 }
@@ -522,23 +525,26 @@ function checkTemplateUpdate(manual) {
   if (!manual && ((S.meta.tpl || 1) >= TPL_VERSION || S.tplAsked)) return;
   S.tplAsked = true;
   const plan = templateUpdatePlan();
-  if (!plan.same.length) {
-    if (manual) toast('Aucune page d’origine à mettre à jour : tes pages ont toutes été modifiées.');
+  if (!plan.same.length && !plan.changed.length) {
+    if (manual) toast('Aucune page du modèle dans ce dossier.');
     else if ((S.meta.tpl || 1) < TPL_VERSION) { S.meta.tpl = TPL_VERSION; markMeta(); }
     return;
   }
   const n = plan.same.length, m = plan.changed.length;
-  const kept = m ? ` ${m} page${m > 1 ? 's' : ''} que tu as modifiée${m > 1 ? 's' : ''} ${m > 1 ? 'restent' : 'reste'} telle${m > 1 ? 's' : ''} quelle${m > 1 ? 's' : ''}.` : '';
+  const box = h('input', { type: 'checkbox', id: 'tpl-all' });
+  const list = plan.changed.slice(0, 6).map(p => p.name).join(', ') + (m > 6 ? '…' : '');
   openModal(h('div', { class: 'confirm' },
     h('h2', null, 'Nouvelle mise en page'),
-    h('p', null, `Cartes arrondies, filets, typographie plus nette : ${n} page${n > 1 ? 's' : ''} du modèle ${n > 1 ? 'passent' : 'passe'} au nouveau style.${kept} Ctrl+Z annule la mise à jour.`),
+    h('p', null, `Minion partout, plus aucun filet, plus d’air : ${n} page${n > 1 ? 's' : ''} du modèle ${n > 1 ? 'passent' : 'passe'} au nouveau style. Ctrl+Z annule la mise à jour.`),
+    m ? h('label', { class: 'tplall', for: 'tpl-all' }, box, h('span', null, `Remplacer aussi ${m > 1 ? 'les ' + m + ' pages que tu as modifiées' : 'la page que tu as modifiée'} (${list}). Tes changements sur ${m > 1 ? 'ces pages' : 'cette page'} seront perdus.`)) : null,
     h('div', { class: 'mbtns' },
       btn('Plus tard', () => { closeModal(); toast('Tu pourras le faire depuis le menu ⋯'); }, 'ghost'),
-      btn('Mettre à jour', () => { closeModal(); applyTemplateUpdate(plan); }, 'primary'))), 'small');
+      btn('Mettre à jour', () => { const all = box.checked; closeModal(); applyTemplateUpdate(plan, all); }, 'primary'))), 'small');
 }
-function applyTemplateUpdate(plan) {
+function applyTemplateUpdate(plan, all) {
+  const pages = all ? [...plan.same, ...plan.changed] : plan.same;
   structChange(() => {
-    for (const p of plan.same) {
+    for (const p of pages) {
       const np = clone(plan.byName.get(p.name));
       np.id = p.id;
       S.pages.set(p.id, np);
@@ -551,7 +557,7 @@ function applyTemplateUpdate(plan) {
   renderSidebar();
   renderStage();
   renderInspector();
-  toast(`${plan.same.length} pages mises au nouveau style.`);
+  toast(`${pages.length} page${pages.length > 1 ? 's' : ''} au nouveau style.`);
 }
 function onRemoteMeta(meta) {
   if (SAVE.meta || SAVE.busy) return;

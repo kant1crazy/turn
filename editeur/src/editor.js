@@ -1146,6 +1146,12 @@ function exitEdit() {
     tx.removeEventListener('paste', onEditPaste);
     tx.contentEditable = 'false';
     if (el) el.html = sanitizeHTML(tx.innerHTML);
+    // hauteur fixe : si le texte déborde après écriture, la carte s'agrandit
+    if (el && el.autoH === false) {
+      const cs = getComputedStyle(node);
+      const need = tx.scrollHeight + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+      if (need > el.h + 1) el.h = Math.ceil(need);
+    }
   }
   S.editing = null;
   UI.ttb.hidden = true;

@@ -46,8 +46,7 @@ function renderChrome(page, index, mode) {
   if (index <= 0) return box;
   const dark = isDark(page.bg || '#FFFFFF');
   const b = chromeBounds(page);
-  const total = S.meta ? S.meta.order.length : 0;
-  const ink = dark ? '#F5F5F7' : C.ink, sub = dark ? '#A1A1A6' : C.sub, hair = dark ? C.darkHair : C.hair;
+  const ink = dark ? '#F5F5F7' : C.ink, sub = dark ? '#A1A1A6' : C.sub;
   if (ch.header !== false && !b.full) {
     const chap = chapterOf(page.chapter);
     const label = chap.id === 'ouv' ? (page.name || '') : chap.name;
@@ -56,13 +55,10 @@ function renderChrome(page, index, mode) {
       h('b', { style: { color: ink } }, (S.meta && S.meta.brand) || 'Sarments'),
       h('span', null, label),
       chap.num ? h('em', null, chap.num) : null));
-    box.append(h('div', { class: 'ch-rule', style: { left: b.x0 + 'px', top: '62px', width: (b.x1 - b.x0) + 'px', background: hair } }));
   }
   if (ch.folio !== false && !b.full) {
-    box.append(h('div', { class: 'ch-rule', style: { left: b.x0 + 'px', top: '1118px', width: (b.x1 - b.x0) + 'px', background: hair } }));
-    box.append(h('div', { class: 'ch-foot', style: { left: b.x0 + 'px', width: (b.x1 - b.x0) + 'px', color: sub } },
-      h('span', null, 'Dossier de projet'),
-      h('span', null, h('b', { style: { color: ink } }, String(index + 1).padStart(2, '0')), total ? ' / ' + String(total).padStart(2, '0') : '')));
+    box.append(h('div', { class: 'ch-foot', style: { left: b.x0 + 'px', width: (b.x1 - b.x0) + 'px', color: ink } },
+      String(index + 1).padStart(2, '0')));
   }
   return box;
 }

@@ -5,7 +5,7 @@
   --doc-sel: #BCDBEF; --doc-handle: #0087F0;
   position: relative; width: 1680px; height: 1188px; overflow: hidden; background: #fff; color: #1D1D1F;
   --hair: #E1DFDA; --sub: #6E6E73; --kc: #0B6FC7; --pill: #EEEEEA;
-  font-family: 'Crimson Pro', Georgia, serif; font-kerning: normal; font-variant-ligatures: common-ligatures;
+  font-family: 'DocSerif', Georgia, serif; font-kerning: normal; font-variant-ligatures: common-ligatures;
   -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; contain: layout paint;
   user-select: none; -webkit-user-select: none;
 }
@@ -23,12 +23,12 @@
 .pg .t-text.box-fill { overflow: hidden; }
 
 /* Contenu structuré des cartes et des textes */
-.pg .tx .k { font: 600 12.5px/1.3 'Instrument Sans', system-ui, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--kc); font-style: normal; }
+.pg .tx .k { font: 400 14px/1.3 'DocSerif', Georgia, serif; letter-spacing: .14em; text-transform: uppercase; color: var(--kc); font-style: normal; }
 .pg .tx .k.g { color: var(--sub); }
-.pg .tx .k + p { margin-top: .55em; }
-.pg .tx .t { font-family: 'Crimson Pro', Georgia, serif; font-size: 1.9em; line-height: 1.12; letter-spacing: -.005em; font-weight: 400; }
+.pg .tx .k + p { margin-top: .6em; }
+.pg .tx .t { font-family: 'DocSerif', Georgia, serif; font-size: 1.75em; line-height: 1.12; letter-spacing: 0; font-weight: 400; }
 .pg .tx .t + p { margin-top: .5em; }
-.pg .tx .n { font-family: 'Instrument Sans', system-ui, sans-serif; font-weight: 600; font-size: 3.6em; line-height: 1; letter-spacing: -.035em; }
+.pg .tx .n { font-family: 'DocSerif', Georgia, serif; font-weight: 400; font-size: 3.8em; line-height: 1; letter-spacing: -.01em; }
 .pg .tx .n + p { margin-top: .45em; }
 .pg .tx .s { color: var(--sub); }
 .pg .tx .acc { color: var(--kc); }
@@ -36,13 +36,13 @@
 .pg .tx .k.brown, .pg .tx .brown { color: #7A4B2A; }
 .pg .on-dark .k.green, .pg.is-dark .tx .green { color: #9DB38E; }
 .pg .on-dark .k.brown, .pg.is-dark .tx .brown { color: #D7A982; }
-.pg .tx .row { border-top: 1.5px solid var(--hair); padding-top: .7em; margin-top: .7em; }
-.pg .tx .row.first { border-top: 0; padding-top: 0; }
-.pg .tx .k.row { margin-top: 1.5em; padding-top: 1.15em; }
-.pg .tx .k.row.first { margin-top: 0; padding-top: 0; }
+.pg .tx .row { margin-top: .55em; }
+.pg .tx .row.first { margin-top: 0; }
+.pg .tx .k.row { margin-top: 1.9em; }
+.pg .tx .k.row.first { margin-top: 0; }
 .pg .tx p.li.row { padding-left: 1.05em; }
-.pg .tx .end { border-bottom: 1.5px solid var(--hair); padding-bottom: .7em; }
-.pg .tx .pill { display: inline-block; background: var(--pill); border-radius: 999px; padding: .32em .95em .36em; margin: 0 .3em .45em 0; line-height: 1.2; font-weight: 600; letter-spacing: 0; }
+
+.pg .tx .pill { display: inline-block; background: var(--pill); border-radius: 999px; padding: .3em .9em .32em; margin: 0 .35em .45em 0; line-height: 1.2; letter-spacing: .02em; }
 .pg .st-cover .tx p + p, .pg .st-h1 .tx p + p, .pg .st-h2 .tx p + p, .pg .st-num .tx p + p { margin-top: 0; }
 .pg .tx p.tight + p, .pg .tx p + p.tight { margin-top: 0.18em; }
 .pg .tx b, .pg .tx strong { font-weight: 600; }
@@ -58,7 +58,7 @@
 .pg.is-dark mark.sel { color: #141414; }
 .pg mark.sel::before, .pg mark.sel::after {
   content: ""; position: absolute; width: var(--hd); pointer-events: none;
-  height: calc(1.111em + var(--hd) / 2);
+  height: calc(var(--doc-ch, 1.111em) + var(--hd) / 2);
 }
 .pg mark.sel::before {
   left: calc(var(--hd) / -2); top: calc(var(--hd) / -2);
@@ -91,7 +91,7 @@
 
 /* Étiquettes PESTELÉ & co */
 .pg .tag {
-  display: inline-block; font-family: 'Instrument Sans', system-ui, sans-serif; font-weight: 600; font-style: normal;
+  display: inline-block; font-family: 'DocSerif', Georgia, serif; font-weight: 400; font-style: normal;
   font-size: 0.66em; letter-spacing: 0.08em; text-transform: uppercase; line-height: 1.6; padding: 0 0.7em;
   border-radius: 999px; margin-right: 0.55em; vertical-align: 0.14em; text-indent: 0;
 }
@@ -101,11 +101,11 @@
 .pg .tag.warn { background: #F3D5CF; color: #8A2B20; }
 
 /* Sommaire automatique */
-.pg .toc-row { display: flex; align-items: baseline; gap: 0.7em; border-top: 1.5px solid var(--hair); padding-top: .42em; }
-.pg .toc-row + .toc-row { margin-top: .42em; }
-.pg .toc-n { width: 2.6em; flex: none; font: 600 0.42em/1 'Instrument Sans', system-ui, sans-serif; letter-spacing: 0.1em; color: var(--kc); }
+.pg .toc-row { display: flex; align-items: baseline; gap: 0.7em; }
+.pg .toc-row + .toc-row { margin-top: .5em; }
+.pg .toc-n { width: 2.4em; flex: none; font: 400 0.48em/1 'DocSerif', Georgia, serif; letter-spacing: 0.12em; color: var(--kc); }
 .pg .toc-t { flex: 1; }
-.pg .toc-p { flex: none; font: 600 0.42em/1 'Instrument Sans', system-ui, sans-serif; letter-spacing: 0.08em; color: var(--sub); }
+.pg .toc-p { flex: none; font: 400 0.48em/1 'DocSerif', Georgia, serif; letter-spacing: 0.1em; color: var(--sub); }
 
 /* Images, cadres vides */
 .pg .im { background-repeat: no-repeat; }
@@ -124,13 +124,12 @@
 /* En-tête courant & folio */
 .pg .chrome { position: absolute; inset: 0; pointer-events: none; }
 .pg .ch-head, .pg .ch-foot { position: absolute; display: flex; align-items: center; gap: 12px; white-space: nowrap;
-  font: 600 11.5px/1 'Instrument Sans', system-ui, sans-serif; letter-spacing: .14em; text-transform: uppercase; }
-.pg .ch-head { top: 34px; }
-.pg .ch-head b, .pg .ch-foot b { font-weight: 600; }
+  font: 400 13px/1 'DocSerif', Georgia, serif; letter-spacing: .16em; text-transform: uppercase; }
+.pg .ch-head { top: 44px; }
+.pg .ch-head b, .pg .ch-foot b { font-weight: 400; }
 .pg .ch-head em { font-style: normal; margin-left: auto; }
 .pg .ch-head .tri { display: block; width: 0; height: 0; border-top: 4.5px solid transparent; border-bottom: 4.5px solid transparent; border-left: 7px solid #1D1D1F; }
-.pg .ch-rule { position: absolute; height: 1.5px; }
-.pg .ch-foot { top: 1136px; justify-content: space-between; }
+.pg .ch-foot { top: 1124px; justify-content: flex-end; }
 
 /* Présentation : animations d'entrée */
 .pg.mode-present .anim { animation-duration: .9s; animation-fill-mode: both; animation-timing-function: cubic-bezier(.2,.7,.1,1); animation-delay: calc(var(--d, 0ms) + 220ms); }

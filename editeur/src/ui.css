@@ -6,7 +6,7 @@
   --tx: #ECE9E2; --mut: #A29E95; --dim: #6E6A62; --acc: #1E8FF2; --acc2: #56ABF5; --accS: rgba(30,143,242,.16);
   --sel: #BCDBEF; --danger: #E5584F; --ok: #5FBF83; --warn: #E7A83E;
   --f-ui: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --f-doc: 'Crimson Pro', Georgia, serif;
+  --f-doc: 'DocSerif', Georgia, serif;
   --r: 8px;
 }
 * { box-sizing: border-box; }
@@ -296,3 +296,6 @@ textarea { height: auto; padding: 8px; resize: vertical; line-height: 1.45; }
   .btn.ghost span { display: none; }
   .ob-list { grid-template-columns: 1fr; }
 }
+
+.tplall { display: flex; gap: 10px; align-items: flex-start; margin: 4px 0 18px; color: var(--mut); font-size: 13px; line-height: 1.45; cursor: pointer; }
+.tplall input { margin-top: 3px; accent-color: var(--acc); }

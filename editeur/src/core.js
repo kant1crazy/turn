@@ -76,17 +76,18 @@ function isDark(hex) {
    pour que l'écran et le PDF utilisent exactement les mêmes fichiers. */
 const FAM = {
   serif: {
-    css: 'Crimson Pro', pdf: 'CrimsonPro', asc: 918 / 1024, desc: 220 / 1024,
-    files: { n4: 'CrimsonPro-Regular', n6: 'CrimsonPro-SemiBold', i4: 'CrimsonPro-Italic', i6: 'CrimsonPro-SemiBoldItalic' }
+    css: 'DocSerif', pdf: 'DocSerif', asc: 0.9, ascK: {}, chK: {},
+    // la Minion (privée) si elle est embarquée ; sinon Crimson Pro, très proche. Gras et italique : Crimson Pro.
+    files: { n4: FONTDATA['MinionPro-Regular'] ? 'MinionPro-Regular' : 'CrimsonPro-Regular', n6: 'CrimsonPro-SemiBold', i4: 'CrimsonPro-Italic', i6: 'CrimsonPro-SemiBoldItalic' }
   },
   sans: {
-    css: 'Instrument Sans', pdf: 'InstrumentSans', asc: 970 / 1000, desc: 250 / 1000,
+    css: 'Instrument Sans', pdf: 'InstrumentSans', asc: 0.97, ascK: {}, chK: {},
     files: { n4: 'InstrumentSans-Regular', n6: 'InstrumentSans-SemiBold' }
   }
 };
 const STACK = {
-  serif: "'Crimson Pro', 'Instrument Sans', Georgia, serif",
-  sans: "'Instrument Sans', 'Crimson Pro', system-ui, sans-serif"
+  serif: "'DocSerif', 'Instrument Sans', Georgia, serif",
+  sans: "'Instrument Sans', 'DocSerif', system-ui, sans-serif"
 };
 function b64ToBytes(b64) {
   const bin = atob(b64), out = new Uint8Array(bin.length);
@@ -106,6 +107,30 @@ async function loadFonts() {
     }
   }
   await Promise.all(jobs);
+  measureAscents();
+}
+/* Hauteur d'ascendante réellement utilisée par le navigateur, pour poser
+   les lignes de base du PDF exactement comme à l'écran. */
+function measureAscents() {
+  for (const F of Object.values(FAM)) {
+    for (const key of Object.keys(F.files)) {
+      if (!FONTDATA[F.files[key]]) continue;
+      const box = document.createElement('div');
+      box.style.cssText = `position:absolute;left:-9999px;top:0;white-space:nowrap;line-height:1;font-size:200px;font-family:'${F.css}';font-weight:${key[1] === '6' ? 600 : 400};font-style:${key[0] === 'i' ? 'italic' : 'normal'}`;
+      const t = document.createTextNode('H');
+      const mk = document.createElement('span');
+      mk.style.cssText = 'display:inline-block;width:1px;height:0;vertical-align:baseline';
+      box.append(t, mk);
+      document.body.append(box);
+      const r = document.createRange();
+      r.setStart(t, 0); r.setEnd(t, 1);
+      const rc = r.getClientRects()[0], base = mk.getBoundingClientRect().bottom;
+      if (rc && rc.height) { F.ascK[key] = (base - rc.top) / 200; F.chK[key] = rc.height / 200; }
+      box.remove();
+    }
+    if (F.ascK.n4) F.asc = F.ascK.n4;
+  }
+  if (FAM.serif.chK.n4) document.documentElement.style.setProperty('--doc-ch', FAM.serif.chK.n4.toFixed(4) + 'em');
 }
 const COVER = {};
 function covers(file, cp) {
@@ -123,21 +148,21 @@ function famKeyFromCss(ff) {
 /* ---------------------------------------------------------------- styles typographiques
    Tailles en px de page (4 px = 1 mm ; 1 px ≈ 0,71 pt). */
 const STYLES = {
-  cover:   { label: 'Titre de couverture', ff: 'serif', fs: 176, lh: 0.95, ls: 0.01, fw: 400, up: true },
-  h1:      { label: 'Titre de section', ff: 'serif', fs: 124, lh: 0.97, ls: -0.015, fw: 400 },
-  h2:      { label: 'Titre de page', ff: 'serif', fs: 76, lh: 1.03, ls: -0.01, fw: 400 },
-  h3:      { label: 'Intertitre', ff: 'sans', fs: 21, lh: 1.3, ls: -0.005, fw: 600 },
+  cover:   { label: 'Titre de couverture', ff: 'serif', fs: 176, lh: 0.95, ls: 0.02, fw: 400, up: true },
+  h1:      { label: 'Titre de section', ff: 'serif', fs: 124, lh: 0.98, ls: -0.01, fw: 400 },
+  h2:      { label: 'Titre de page', ff: 'serif', fs: 76, lh: 1.04, ls: -0.005, fw: 400 },
+  h3:      { label: 'Intertitre', ff: 'serif', fs: 26, lh: 1.25, ls: 0, fw: 400 },
   lead:    { label: 'Chapeau', ff: 'serif', fs: 30, lh: 1.3, ls: 0, fw: 400 },
-  body:    { label: 'Texte courant', ff: 'sans', fs: 16.5, lh: 1.6, ls: 0, fw: 400 },
-  small:   { label: 'Texte secondaire', ff: 'sans', fs: 14.5, lh: 1.55, ls: 0, fw: 400, tone: 'sub' },
-  eyebrow: { label: 'Surtitre', ff: 'sans', fs: 13, lh: 1.3, ls: 0.12, fw: 600, up: true, tone: 'blue' },
-  label:   { label: 'Étiquette', ff: 'sans', fs: 12.5, lh: 1.3, ls: 0.12, fw: 600, up: true, tone: 'sub' },
-  sanslab: { label: 'Étiquette foncée', ff: 'sans', fs: 12.5, lh: 1.3, ls: 0.12, fw: 600, up: true },
-  num:     { label: 'Chiffre clé', ff: 'sans', fs: 104, lh: 0.95, ls: -0.035, fw: 600 },
-  quote:   { label: 'Citation', ff: 'serif', fs: 44, lh: 1.2, ls: 0, fw: 400, it: true },
-  card:    { label: 'Carte', ff: 'sans', fs: 16, lh: 1.55, ls: 0, fw: 400, box: 'fill', bg: '#F4F4F1', rad: 28, pad: [32, 34] },
-  keep:    { label: 'À retenir', ff: 'serif', fs: 22, lh: 1.32, ls: 0, fw: 600, box: 'fill', bg: '#E8F1FB', rad: 24, pad: [24, 30] },
-  caption: { label: 'Légende', ff: 'sans', fs: 12.5, lh: 1.45, ls: 0, fw: 400, tone: 'sub' }
+  body:    { label: 'Texte courant', ff: 'serif', fs: 18, lh: 1.5, ls: 0, fw: 400 },
+  small:   { label: 'Texte secondaire', ff: 'serif', fs: 15.5, lh: 1.45, ls: 0, fw: 400, tone: 'sub' },
+  eyebrow: { label: 'Surtitre', ff: 'serif', fs: 14, lh: 1.3, ls: 0.16, fw: 400, up: true, tone: 'blue' },
+  label:   { label: 'Étiquette', ff: 'serif', fs: 13.5, lh: 1.3, ls: 0.14, fw: 400, up: true, tone: 'sub' },
+  sanslab: { label: 'Étiquette foncée', ff: 'serif', fs: 13.5, lh: 1.3, ls: 0.14, fw: 400, up: true },
+  num:     { label: 'Chiffre clé', ff: 'serif', fs: 110, lh: 0.95, ls: -0.01, fw: 400 },
+  quote:   { label: 'Citation', ff: 'serif', fs: 44, lh: 1.2, ls: 0, fw: 400 },
+  card:    { label: 'Carte', ff: 'serif', fs: 17, lh: 1.5, ls: 0, fw: 400, box: 'fill', bg: '#F4F4F1', rad: 28, pad: [34, 36] },
+  keep:    { label: 'À retenir', ff: 'serif', fs: 23, lh: 1.32, ls: 0, fw: 400, box: 'fill', bg: '#E8F1FB', rad: 24, pad: [26, 32] },
+  caption: { label: 'Légende', ff: 'serif', fs: 13.5, lh: 1.4, ls: 0, fw: 400, tone: 'sub' }
 };
 const TEXT_KEYS = ['ff', 'fs', 'lh', 'ls', 'fw', 'it', 'up', 'col', 'al', 'box', 'bg', 'pad', 'rad', 'tone'];
 function textStyle(el) {
@@ -177,7 +202,12 @@ function stableJSON(v) {
   return JSON.stringify(v);
 }
 function pageSig(p) {
-  const els = (p.els || []).map(e => { const o = { ...e }; delete o.id; delete o._h; return o; });
+  const els = (p.els || []).map(e => {
+    const o = { ...e };
+    delete o.id; delete o._h;
+    if (o.t === 'text' && o.autoH !== false) delete o.h;
+    return o;
+  });
   const s = stableJSON([p.chapter, p.beat, p.name, p.bg, p.chrome, p.notes || '', els]);
   let h = 0x811c9dc5;
   for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193); }
