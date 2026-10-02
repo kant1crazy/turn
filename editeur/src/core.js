@@ -11,11 +11,12 @@ const cw = n => n * COLW + (n - 1) * GUT;              // largeur de n colonnes
 const PT_PER_PX = 0.25 * 72 / 25.4;                    // 1 px de page = 0,7087 pt
 
 const C = {
-  ink: '#141414', paper: '#FFFFFF', sel: '#BCDBEF', handle: '#0087F0', green: '#4D5D43',
-  brown: '#7A4B2A', kraft: '#C9A27E', warm: '#F4EFE6', sand: '#E7DCCB', muted: '#5C5C5C',
-  line: '#CFC9BF', dark: '#151515', white: '#FFFFFF', grey: '#8C8780'
+  ink: '#1D1D1F', paper: '#FFFFFF', sel: '#BCDBEF', handle: '#0087F0', blue: '#0B6FC7', green: '#4D5D43',
+  brown: '#7A4B2A', kraft: '#C9A27E', warm: '#F4EFE6', sand: '#E7DCCB', muted: '#6E6E73', sub: '#6E6E73',
+  line: '#E1DFDA', hair: '#E1DFDA', card: '#F4F4F1', cardBlue: '#E8F1FB', cardGreen: '#EDF1E9', cardBrown: '#F5EEE7',
+  dark: '#121212', darkCard: '#1E1E20', darkHair: '#2F2F31', white: '#FFFFFF', grey: '#8C8780'
 };
-const SWATCHES = ['#141414', '#FFFFFF', '#BCDBEF', '#0087F0', '#4D5D43', '#7A4B2A', '#C9A27E', '#F4EFE6', '#E7DCCB', '#5C5C5C', '#8C8780', '#151515'];
+const SWATCHES = ['#1D1D1F', '#FFFFFF', '#F4F4F1', '#E8F1FB', '#BCDBEF', '#0087F0', '#4D5D43', '#EDF1E9', '#7A4B2A', '#F5EEE7', '#C9A27E', '#6E6E73', '#121212', '#1E1E20'];
 
 const NB = ' ';
 function typo(s) {
@@ -122,27 +123,29 @@ function famKeyFromCss(ff) {
 /* ---------------------------------------------------------------- styles typographiques
    Tailles en px de page (4 px = 1 mm ; 1 px ≈ 0,71 pt). */
 const STYLES = {
-  cover:   { label: 'Titre de couverture', ff: 'serif', fs: 150, lh: 1.0, ls: 0.03, fw: 400, up: true },
-  h1:      { label: 'Titre de section', ff: 'serif', fs: 128, lh: 0.95, ls: -0.01, fw: 400 },
-  h2:      { label: 'Titre de page', ff: 'serif', fs: 84, lh: 1.0, ls: -0.005, fw: 400 },
-  h3:      { label: 'Intertitre', ff: 'serif', fs: 24, lh: 1.22, ls: 0.04, fw: 400, up: true },
+  cover:   { label: 'Titre de couverture', ff: 'serif', fs: 176, lh: 0.95, ls: 0.01, fw: 400, up: true },
+  h1:      { label: 'Titre de section', ff: 'serif', fs: 124, lh: 0.97, ls: -0.015, fw: 400 },
+  h2:      { label: 'Titre de page', ff: 'serif', fs: 76, lh: 1.03, ls: -0.01, fw: 400 },
+  h3:      { label: 'Intertitre', ff: 'sans', fs: 21, lh: 1.3, ls: -0.005, fw: 600 },
   lead:    { label: 'Chapeau', ff: 'serif', fs: 30, lh: 1.3, ls: 0, fw: 400 },
-  body:    { label: 'Texte courant', ff: 'serif', fs: 18, lh: 1.5, ls: 0, fw: 400 },
-  small:   { label: 'Texte secondaire', ff: 'serif', fs: 15, lh: 1.45, ls: 0, fw: 400 },
-  label:   { label: 'Étiquette', ff: 'serif', fs: 13, lh: 1.3, ls: 0.12, fw: 400, up: true },
-  sanslab: { label: 'Étiquette linéale', ff: 'sans', fs: 12, lh: 1.3, ls: 0.1, fw: 600, up: true },
-  num:     { label: 'Chiffre clé', ff: 'serif', fs: 116, lh: 0.95, ls: -0.02, fw: 400 },
-  quote:   { label: 'Citation', ff: 'serif', fs: 42, lh: 1.2, ls: 0, fw: 400, it: true },
-  keep:    { label: 'À retenir', ff: 'serif', fs: 19, lh: 1.38, ls: 0, fw: 600, box: 'sel', pad: [18, 24] },
-  caption: { label: 'Légende', ff: 'serif', fs: 13, lh: 1.35, ls: 0, fw: 400, col: '#5C5C5C' }
+  body:    { label: 'Texte courant', ff: 'sans', fs: 16.5, lh: 1.6, ls: 0, fw: 400 },
+  small:   { label: 'Texte secondaire', ff: 'sans', fs: 14.5, lh: 1.55, ls: 0, fw: 400, tone: 'sub' },
+  eyebrow: { label: 'Surtitre', ff: 'sans', fs: 13, lh: 1.3, ls: 0.12, fw: 600, up: true, tone: 'blue' },
+  label:   { label: 'Étiquette', ff: 'sans', fs: 12.5, lh: 1.3, ls: 0.12, fw: 600, up: true, tone: 'sub' },
+  sanslab: { label: 'Étiquette foncée', ff: 'sans', fs: 12.5, lh: 1.3, ls: 0.12, fw: 600, up: true },
+  num:     { label: 'Chiffre clé', ff: 'sans', fs: 104, lh: 0.95, ls: -0.035, fw: 600 },
+  quote:   { label: 'Citation', ff: 'serif', fs: 44, lh: 1.2, ls: 0, fw: 400, it: true },
+  card:    { label: 'Carte', ff: 'sans', fs: 16, lh: 1.55, ls: 0, fw: 400, box: 'fill', bg: '#F4F4F1', rad: 28, pad: [32, 34] },
+  keep:    { label: 'À retenir', ff: 'serif', fs: 22, lh: 1.32, ls: 0, fw: 600, box: 'fill', bg: '#E8F1FB', rad: 24, pad: [24, 30] },
+  caption: { label: 'Légende', ff: 'sans', fs: 12.5, lh: 1.45, ls: 0, fw: 400, tone: 'sub' }
 };
-const TEXT_KEYS = ['ff', 'fs', 'lh', 'ls', 'fw', 'it', 'up', 'col', 'al', 'box', 'bg', 'pad'];
+const TEXT_KEYS = ['ff', 'fs', 'lh', 'ls', 'fw', 'it', 'up', 'col', 'al', 'box', 'bg', 'pad', 'rad', 'tone'];
 function textStyle(el) {
   const base = STYLES[el.st] || STYLES.body;
-  const s = { ff: 'serif', fs: 18, lh: 1.5, ls: 0, fw: 400, it: false, up: false, col: null, al: 'left', box: 'none', bg: null, pad: null, ...base };
+  const s = { ff: 'serif', fs: 18, lh: 1.5, ls: 0, fw: 400, it: false, up: false, col: null, al: 'left', box: 'none', bg: null, pad: null, rad: 0, tone: null, ...base };
   for (const k of TEXT_KEYS) if (el[k] !== undefined && el[k] !== null) s[k] = el[k];
   if (s.box === 'sel' && !s.pad) s.pad = [18, 24];
-  if (s.box === 'fill' && !s.pad) s.pad = [22, 26];
+  if (s.box === 'fill' && !s.pad) s.pad = [26, 30];
   return s;
 }
 
@@ -163,3 +166,20 @@ const BEATS = ['—', '1 · Opening Image', '2 · Theme Stated', '3 · Set-Up', 
   '7 · B Story', '8 · Fun and Games', '9 · Midpoint', '10 · Bad Guys Close In', '11 · All Is Lost', '12 · Dark Night of the Soul',
   '13 · Break into Three', '14 · Finale', '15 · Final Image'];
 function chapterOf(id) { return CHAPTERS.find(c => c.id === id) || CHAPTERS[0]; }
+
+/* ---------------------------------------------------------------- empreinte d'une page
+   Sert à savoir si une page du modèle a été modifiée (mise à jour du modèle). */
+function stableJSON(v) {
+  if (Array.isArray(v)) return '[' + v.map(stableJSON).join(',') + ']';
+  if (v && typeof v === 'object') {
+    return '{' + Object.keys(v).filter(k => v[k] != null).sort().map(k => JSON.stringify(k) + ':' + stableJSON(v[k])).join(',') + '}';
+  }
+  return JSON.stringify(v);
+}
+function pageSig(p) {
+  const els = (p.els || []).map(e => { const o = { ...e }; delete o.id; delete o._h; return o; });
+  const s = stableJSON([p.chapter, p.beat, p.name, p.bg, p.chrome, p.notes || '', els]);
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193); }
+  return (h >>> 0).toString(36) + '.' + s.length.toString(36);
+}

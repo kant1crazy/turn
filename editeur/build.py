@@ -27,8 +27,9 @@ def build():
         '(() => {\n'
         f'const FONTDATA = {json.dumps(fontdata)};\n'
         f'const FONTCOV = {json.dumps(cov, separators=(",", ":"))};\n'
+        f'const V1SIG = {json.dumps(json.load(open(os.path.join(SRC, "v1sig.json"), encoding="utf-8")), ensure_ascii=False, separators=(",", ":"))};\n'
         + js +
-        '\nwindow.__ed = { S, SAVE, buildPDF, buildDossier, renderPage, goPage, startPresent, stopPresent, flushSave, createFromTemplate, sanitizeHTML };\n'
+        '\nwindow.__ed = { S, SAVE, buildPDF, buildDossier, renderPage, goPage, startPresent, stopPresent, flushSave, createFromTemplate, sanitizeHTML, checkTemplateUpdate, pageSig };\n'
         'boot().catch(e => { console.error(e); const o = document.getElementById("onboard"); if (o) { o.hidden = false; o.textContent = "Erreur au démarrage : " + (e && e.message || e); } });\n'
         '})();\n'
     )

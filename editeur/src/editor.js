@@ -119,7 +119,8 @@ const ICON = {
   select: '<path d="M6 3l12 9-6 1.2L9.5 20z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
   title: '<path d="M5 6h14M12 6v13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>',
   text: '<path d="M5 6h14M5 11h14M5 16h9" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/>',
-  keep: '<rect x="4" y="7" width="16" height="10" fill="currentColor" opacity=".35"/><path d="M4 5v12M20 7v12" stroke="currentColor" stroke-width="1.6"/><circle cx="4" cy="5" r="2" fill="currentColor"/><circle cx="20" cy="19" r="2" fill="currentColor"/>',
+  keep: '<rect x="3.5" y="6" width="17" height="12" rx="3.5" fill="currentColor" opacity=".3"/><path d="M7 10h4M7 14h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>',
+  card: '<rect x="3.5" y="4.5" width="17" height="15" rx="4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7.5 9h5M7.5 13h9M7.5 16h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
   num: '<text x="12" y="17" text-anchor="middle" font-size="13" font-family="Georgia,serif" fill="currentColor">93</text>',
   quote: '<path d="M6 10c0-2 1-3 3-3M6 10v4h3v-4H6zM14 10c0-2 1-3 3-3M14 10v4h3v-4h-3z" fill="none" stroke="currentColor" stroke-width="1.6"/>',
   image: '<rect x="4" y="5" width="16" height="14" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M4 16l5-5 4 4 3-3 4 4" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="15.5" cy="9" r="1.5" fill="currentColor"/>',
@@ -241,7 +242,7 @@ function toast(msg, kind = '', ms = 3200) {
 function buildToolbar() {
   const tools = [
     ['select', 'Sélection (V)', 'select'], '|',
-    ['title', 'Titre', 'title'], ['text', 'Texte (T)', 'text'], ['keep', 'À retenir', 'keep'], ['num', 'Chiffre clé', 'num'], ['quote', 'Citation', 'quote'], '|',
+    ['title', 'Titre', 'title'], ['text', 'Texte (T)', 'text'], ['card', 'Carte', 'card'], ['keep', 'À retenir', 'keep'], ['num', 'Chiffre clé', 'num'], ['quote', 'Citation', 'quote'], '|',
     ['image', 'Importer une image (I)', 'image'], ['frame', 'Cadre photo vide', 'frame'], ['video', 'Vidéo (MP4, WebM)', 'video'], '|',
     ['rect', 'Rectangle (R)', 'rect'], ['ellipse', 'Cercle', 'ellipse'], ['line', 'Ligne (L)', 'line'], ['chart', 'Graphique en anneau', 'chart'], ['pen', 'Dessin à main levée (D)', 'pen'], ['toc', 'Sommaire automatique', 'toc']
   ];
@@ -282,7 +283,8 @@ function toolAction(k) {
   const presets = {
     title: () => T('<p>Titre</p><p class="ind"><mark class="sel">de la page</mark></p>', 0, 0, 760, 'h2', { anim: { type: 'select' } }),
     text: () => T('Double-clique pour écrire.', 0, 0, 626, 'body'),
-    keep: () => KEEP('À retenir : une phrase qui résume la page.', 0, 0, 626),
+    keep: () => KEEP('Une phrase qui résume la page.', 0, 0, 626),
+    card: () => CARD('<p class="k">Surtitre</p><p class="t">Titre de la carte</p><p>Texte de la carte. Double-clique pour écrire.</p>', 0, 0, 496, 300),
     num: () => T('00 %', 0, 0, 360, 'num'),
     quote: () => T('« Une phrase forte. »', 0, 0, 900, 'quote')
   };
@@ -293,9 +295,9 @@ function toolAction(k) {
     case 'image': pickFile('image/*', files => addFiles(files)); break;
     case 'video': pickFile('video/mp4,video/webm', files => addFiles(files)); break;
     case 'frame': setTool('select'); insertEl(FRAME('Glisse une photo ici', 0, 0, 600, 420), { edit: false }); break;
-    case 'rect': setTool('select'); insertEl(R(0, 0, 360, 240, C.sel), { edit: false }); break;
+    case 'rect': setTool('select'); insertEl(R(0, 0, 360, 240, C.card, { rad: 28 }), { edit: false }); break;
     case 'ellipse': setTool('select'); insertEl(ELL(0, 0, 220, 220, C.green), { edit: false }); break;
-    case 'line': setTool('select'); insertEl(LINE(0, 0, 500, 2, C.ink), { edit: false }); break;
+    case 'line': setTool('select'); insertEl(LINE(0, 0, 500, 1.5, C.hair), { edit: false }); break;
     case 'chart': setTool('select'); insertEl(DONUT(0, 0, 300, [{ v: 60, c: C.green, l: 'Part A' }, { v: 40, c: '#D9D3C7', l: 'Part B' }]), { edit: false }); break;
     case 'toc': setTool('select'); insertEl(T('', 0, 0, 756, 'lead', { toc: true, fs: 36, lh: 1.25 }), { edit: false }); break;
   }
@@ -1020,7 +1022,7 @@ function exitCrop() {
 }
 
 /* ---------------------------------------------------------------- édition de texte */
-const ALLOWED = { P: ['li', 'ind', 'tight'], BR: [], B: [], STRONG: [], I: [], EM: [], MARK: ['sel'], SPAN: ['tag', 'up', 'down', 'mix', 'warn'] };
+const ALLOWED = { P: ['li', 'ind', 'tight', 'k', 'g', 't', 'n', 's', 'row', 'first', 'end', 'acc', 'green', 'brown'], BR: [], B: [], STRONG: [], I: [], EM: [], MARK: ['sel'], SPAN: ['tag', 'up', 'down', 'mix', 'warn', 'pill', 's', 'acc', 'green', 'brown'] };
 function sanitizeHTML(html) {
   const box = document.createElement('div');
   box.innerHTML = html;

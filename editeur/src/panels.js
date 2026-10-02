@@ -208,8 +208,9 @@ function textPanel(box, el) {
       h('span', { class: 'mini-l' }, 'Capitales'), togIn(!!s.up, v => setProp(e => { e.up = v; }), 'Capitales'))),
     row('Alignement', segIn(s.al || 'left', [['left', 'Gauche', 'tl'], ['center', 'Centré', 'tc'], ['right', 'Droite', 'tr'], ['justify', 'Justifié', 'tj']], v => setProp(e => { e.al = v; }))),
     row('Couleur', swIn(el.col || null, v => setProp(e => { e.col = v; }), 'Automatique')),
-    row('Cadre', segIn(s.box || 'none', [['none', 'Aucun'], ['sel', 'Sélection'], ['fill', 'Fond'], ['rule', 'Filet']], v => setProp(e => { e.box = v; if (v !== 'sel' && v !== 'fill') e.pad = null; }))),
+    row('Cadre', segIn(s.box || 'none', [['none', 'Aucun'], ['sel', 'Sélection'], ['fill', 'Carte'], ['rule', 'Filet']], v => setProp(e => { e.box = v; if (v !== 'sel' && v !== 'fill') e.pad = null; if (v === 'fill' && !textStyle(e).rad) e.rad = 24; }))),
     s.box === 'fill' || s.box === 'sel' ? row('Fond', swIn(el.bg || null, v => setProp(e => { e.bg = v; }), 'Par défaut')) : null,
+    s.box === 'fill' ? row('Arrondi', numIn(s.rad || 0, v => setProp(e => { e.rad = clamp(v, 0, 200); }), { unit: 'px', dec: 0 })) : null,
     row('Hauteur', segIn(el.autoH === false ? 'fixed' : 'auto', [['auto', 'Automatique'], ['fixed', 'Fixe']], v => setProp(e => { if (v === 'auto') e.autoH = true; else { e.h = elH(e); e.autoH = false; } }))),
     el.autoH === false ? row('Vertical', segIn(el.va || 'top', [['top', 'Haut'], ['middle', 'Milieu'], ['bottom', 'Bas']], v => setProp(e => { e.va = v; }))) : null
   ));
@@ -226,6 +227,7 @@ function imagePanel(box, el) {
     el.src ? row('Ajustement', segIn(el.fit || 'cover', [['cover', 'Remplir'], ['contain', 'Contenir']], v => setProp(e => { e.fit = v; }))) : null,
     el.src ? row('Zoom', numIn(Math.round((el.zoom || 1) * 100), v => setProp(e => { e.zoom = clamp(v, 100, 400) / 100; }), { unit: '%', step: 5, dec: 0 })) : null,
     el.src ? row('Noir & blanc', togIn(!!el.gray, v => setProp(e => { e.gray = v; }), 'Noir et blanc')) : null,
+    row('Arrondi', numIn(el.rad || 0, v => setProp(e => { e.rad = clamp(v, 0, 400); }), { unit: 'px', dec: 0 })),
     !el.src ? row('Consigne', ph) : null,
     h('p', { class: 'hint' }, el.src ? 'Double-clique sur l’image pour la recadrer. Glisse une photo dessus pour la remplacer.' : 'Glisse une photo depuis ton ordinateur sur le cadre, ou colle-la (Ctrl+V).')));
 }
@@ -234,6 +236,7 @@ function videoPanel(box, el) {
     h('div', { class: 'ibtns' }, btn('Remplacer…', () => pickFile('video/mp4,video/webm', f => addFiles(f, null, el)), 'primary small', 'video')),
     row('Ajustement', segIn(el.fit || 'cover', [['cover', 'Remplir'], ['contain', 'Contenir']], v => setProp(e => { e.fit = v; }))),
     row('En boucle', togIn(el.loop !== false, v => setProp(e => { e.loop = v; }), 'Lecture en boucle')),
+    row('Arrondi', numIn(el.rad || 0, v => setProp(e => { e.rad = clamp(v, 0, 400); }), { unit: 'px', dec: 0 })),
     h('p', { class: 'hint' }, 'En présentation, la vidéo se lance seule. Dans le PDF, elle est remplacée par son image de couverture.')));
 }
 function shapePanel(box, el) {
@@ -318,11 +321,15 @@ function openGallery() {
     grid.append(card);
   }
   openModal(h('div', null, h('h2', null, 'Nouvelle page'), h('p', { class: 'msub' }, 'Choisis une mise en page : tout reste modifiable ensuite. La page est ajoutée après la page courante.'), grid), 'wide');
+  const fitThumbs = () => $$('.lthumb', grid).forEach(t => { const sc = t.querySelector('.tscale'); if (sc && t.clientWidth) sc.style.transform = `scale(${t.clientWidth / PW})`; });
+  requestAnimationFrame(fitThumbs);
+  if (window.ResizeObserver) new ResizeObserver(fitThumbs).observe(grid);
 }
 function openMoreMenu(anchor) {
   const items = [
     ['Sauvegarde du projet (.json)', exportBackup],
     ['Importer une sauvegarde…', importBackup],
+    ['Passer les pages d’origine au nouveau style…', () => checkTemplateUpdate(true)],
     ['Raccourcis clavier', openHelp],
     ['Réinitialiser à partir du modèle…', () => confirmBox('Réinitialiser tout le dossier ?', `Toutes les pages seront remplacées par le modèle d’origine (${templateCount()} pages). Fais une sauvegarde avant si besoin.`, 'Réinitialiser', () => createFromTemplate(true))]
   ];
@@ -491,6 +498,60 @@ function openProject() {
   renderStage();
   renderInspector();
   refreshUndoButtons();
+  setTimeout(() => checkTemplateUpdate(false), 400);
+}
+
+/* ---------------------------------------------------------------- mise à jour du modèle
+   Les pages du modèle d'origine que personne n'a touchées passent au nouveau style ;
+   les pages modifiées restent telles quelles. */
+function templateUpdatePlan() {
+  const fresh = buildDossier();
+  const byName = new Map(fresh.pages.map(p => [p.name, p]));
+  const same = [], changed = [];
+  for (const id of S.meta.order) {
+    const p = S.pages.get(id);
+    if (!p) continue;
+    const ref = V1SIG[p.name];
+    if (!ref) continue;
+    if (ref === pageSig(p) && byName.has(p.name)) same.push(p); else changed.push(p);
+  }
+  return { same, changed, byName };
+}
+function checkTemplateUpdate(manual) {
+  if (!S.meta || !canEdit()) return;
+  if (!manual && ((S.meta.tpl || 1) >= TPL_VERSION || S.tplAsked)) return;
+  S.tplAsked = true;
+  const plan = templateUpdatePlan();
+  if (!plan.same.length) {
+    if (manual) toast('Aucune page d’origine à mettre à jour : tes pages ont toutes été modifiées.');
+    else if ((S.meta.tpl || 1) < TPL_VERSION) { S.meta.tpl = TPL_VERSION; markMeta(); }
+    return;
+  }
+  const n = plan.same.length, m = plan.changed.length;
+  const kept = m ? ` ${m} page${m > 1 ? 's' : ''} que tu as modifiée${m > 1 ? 's' : ''} ${m > 1 ? 'restent' : 'reste'} telle${m > 1 ? 's' : ''} quelle${m > 1 ? 's' : ''}.` : '';
+  openModal(h('div', { class: 'confirm' },
+    h('h2', null, 'Nouvelle mise en page'),
+    h('p', null, `Cartes arrondies, filets, typographie plus nette : ${n} page${n > 1 ? 's' : ''} du modèle ${n > 1 ? 'passent' : 'passe'} au nouveau style.${kept} Ctrl+Z annule la mise à jour.`),
+    h('div', { class: 'mbtns' },
+      btn('Plus tard', () => { closeModal(); toast('Tu pourras le faire depuis le menu ⋯'); }, 'ghost'),
+      btn('Mettre à jour', () => { closeModal(); applyTemplateUpdate(plan); }, 'primary'))), 'small');
+}
+function applyTemplateUpdate(plan) {
+  structChange(() => {
+    for (const p of plan.same) {
+      const np = clone(plan.byName.get(p.name));
+      np.id = p.id;
+      S.pages.set(p.id, np);
+      markDirty(p.id);
+    }
+    S.meta.tpl = TPL_VERSION;
+    markMeta();
+  });
+  S.sel = [];
+  renderSidebar();
+  renderStage();
+  renderInspector();
+  toast(`${plan.same.length} pages mises au nouveau style.`);
 }
 function onRemoteMeta(meta) {
   if (SAVE.meta || SAVE.busy) return;

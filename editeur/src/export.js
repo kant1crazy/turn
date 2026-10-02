@@ -163,6 +163,11 @@ async function buildPDF(pids, opts, progress) {
         setFill(pdf, cssColorToRgba(getComputedStyle(tri).borderLeftColor) || [20, 20, 20]);
         pdf.triangle(MM(x), MM(y), MM(x), MM(y + r.height), MM(x + r.width), MM(y + r.height / 2), 'F');
       }
+      for (const rl of chrome.querySelectorAll('.ch-rule')) {
+        const r = rl.getBoundingClientRect();
+        setFill(pdf, cssColorToRgba(getComputedStyle(rl).backgroundColor) || [225, 223, 218]);
+        pdf.rect(MM(r.left - ctx.pr.left), MM(r.top - ctx.pr.top), MM(r.width), MM(r.height), 'F');
+      }
       drawWords(ctx, chrome);
     }
     progress(n + 1, pids.length);
@@ -179,6 +184,31 @@ function rotateAround(pdf, cxmm, cymm, deg) {
   pdf.internal.write([c, s, -s, c, e, f].map(v => v.toFixed(6)).join(' ') + ' cm');
 }
 
+/* Chemin de rectangle arrondi écrit directement en PDF (pour découper une image). */
+function roundRectPath(pdf, x, y, w, hh, r) {
+  r = Math.max(0, Math.min(r, w / 2, hh / 2));
+  const k = K_PT, H = 297, c = 0.5523 * r;
+  const P = (X, Y) => (X * k).toFixed(3) + ' ' + ((H - Y) * k).toFixed(3);
+  return [
+    P(x + r, y) + ' m', P(x + w - r, y) + ' l',
+    P(x + w - r + c, y) + ' ' + P(x + w, y + r - c) + ' ' + P(x + w, y + r) + ' c',
+    P(x + w, y + hh - r) + ' l',
+    P(x + w, y + hh - r + c) + ' ' + P(x + w - r + c, y + hh) + ' ' + P(x + w - r, y + hh) + ' c',
+    P(x + r, y + hh) + ' l',
+    P(x + r - c, y + hh) + ' ' + P(x, y + hh - r + c) + ' ' + P(x, y + hh - r) + ' c',
+    P(x, y + r) + ' l',
+    P(x, y + r - c) + ' ' + P(x + r - c, y) + ' ' + P(x + r, y) + ' c'
+  ].join('\n');
+}
+function clipRound(pdf, x, y, w, hh, r) {
+  pdf.internal.write(roundRectPath(pdf, MM(x), MM(y), MM(w), MM(hh), MM(r)) + '\nh W n');
+}
+function fillRound(pdf, x, y, w, hh, r) {
+  const rr = Math.min(r, w / 2, hh / 2);
+  if (rr > 0.5) pdf.roundedRect(MM(x), MM(y), MM(w), MM(hh), MM(rr), MM(rr), 'F');
+  else pdf.rect(MM(x), MM(y), MM(w), MM(hh), 'F');
+}
+
 async function drawElement(ctx, el, node) {
   const { pdf } = ctx;
   const r = node.getBoundingClientRect();
@@ -191,8 +221,8 @@ async function drawElement(ctx, el, node) {
   if (rot) rotateAround(pdf, MM(x + w / 2), MM(y + hh / 2), rot);
   switch (el.t) {
     case 'shape': drawShape(ctx, el, x, y, w, hh); break;
-    case 'image': await drawImage(ctx, el, x, y, w, hh); break;
-    case 'video': await drawImage(ctx, { ...el, src: el.poster, zoom: 1, ph: 'Vidéo' }, x, y, w, hh); break;
+    case 'image': await drawMedia(ctx, el, x, y, w, hh); break;
+    case 'video': await drawMedia(ctx, { ...el, src: el.poster, zoom: 1, ph: 'Vidéo' }, x, y, w, hh); break;
     case 'chart': drawDonut(ctx, el, x, y, w, hh); break;
     case 'draw': drawPen(ctx, el, x, y, w, hh); break;
     case 'text': drawText(ctx, el, node, x, y, w, hh); break;
@@ -245,6 +275,13 @@ function grayscaleCanvas(c) {
   for (let i = 0; i < a.length; i += 4) { const v = 0.2126 * a[i] + 0.7152 * a[i + 1] + 0.0722 * a[i + 2]; a[i] = a[i + 1] = a[i + 2] = v; }
   x.putImageData(d, 0, 0);
 }
+async function drawMedia(ctx, el, x, y, w, hh) {
+  const rad = el.rad ? Math.min(el.rad, w / 2, hh / 2) : 0;
+  if (!rad || !el.src) return drawImage(ctx, el, x, y, w, hh);
+  ctx.pdf.saveGraphicsState();
+  clipRound(ctx.pdf, x, y, w, hh, rad);
+  try { await drawImage(ctx, el, x, y, w, hh); } finally { ctx.pdf.restoreGraphicsState(); }
+}
 async function drawImage(ctx, el, x, y, w, hh) {
   const pdf = ctx.pdf;
   if (!el.src) { if (ctx.opts.empty) drawPlaceholder(ctx, el, x, y, w, hh); return; }
@@ -280,11 +317,13 @@ async function drawImage(ctx, el, x, y, w, hh) {
 }
 function drawPlaceholder(ctx, el, x, y, w, hh) {
   const pdf = ctx.pdf;
-  setFill(pdf, '#EFECE6');
-  setStroke(pdf, '#C9C2B6');
+  setFill(pdf, '#F1F1EE');
+  setStroke(pdf, '#D3D0C9');
   pdf.setLineWidth(0.4);
   pdf.setLineDashPattern([2, 1.5], 0);
-  pdf.rect(MM(x), MM(y), MM(w), MM(hh), 'FD');
+  const rr = el.rad ? Math.min(el.rad, w / 2, hh / 2) : 0;
+  if (rr > 0.5) pdf.roundedRect(MM(x), MM(y), MM(w), MM(hh), MM(rr), MM(rr), 'FD');
+  else pdf.rect(MM(x), MM(y), MM(w), MM(hh), 'FD');
   pdf.setLineDashPattern([], 0);
   if (el.ph) {
     pdf.setFont(FAM.sans.pdf, 'normal');
@@ -358,15 +397,33 @@ function drawText(ctx, el, node, x, y, w, hh) {
   const cs = getComputedStyle(node);
   if (s.box === 'sel' || s.box === 'fill') {
     const bg = cssColorToRgba(cs.backgroundColor);
-    if (bg && bg[3] > 0) { setFill(pdf, bg); pdf.rect(MM(x), MM(y), MM(w), MM(hh), 'F'); }
+    if (bg && bg[3] > 0) { setFill(pdf, bg); fillRound(pdf, x, y, w, hh, parseFloat(cs.borderTopLeftRadius) || 0); }
     if (s.box === 'sel') drawHandles(pdf, x, y, hh, x + w, y, y + hh, 11, 2.5);
   } else if (s.box === 'rule') {
     const bc = cssColorToRgba(cs.borderTopColor) || [20, 20, 20];
     setFill(pdf, bc);
-    pdf.rect(MM(x), MM(y), MM(w), MM(2), 'F');
+    pdf.rect(MM(x), MM(y), MM(w), MM(parseFloat(cs.borderTopWidth) || 1.5), 'F');
   }
+  drawBlockRules(ctx, node);
   drawInlineBoxes(ctx, node);
   drawWords(ctx, node);
+}
+/* Filets de séparation portés par les paragraphes (lignes de liste, sommaire). */
+function drawBlockRules(ctx, root) {
+  const pdf = ctx.pdf, pr = ctx.pr;
+  for (const n of root.querySelectorAll('p')) {
+    const cs = getComputedStyle(n);
+    const r = n.getBoundingClientRect();
+    for (const side of ['Top', 'Bottom']) {
+      const bw = parseFloat(cs['border' + side + 'Width']) || 0;
+      if (bw < 0.3 || cs['border' + side + 'Style'] === 'none') continue;
+      const col = cssColorToRgba(cs['border' + side + 'Color']);
+      if (!col || col[3] === 0) continue;
+      setFill(pdf, col);
+      const yy = side === 'Top' ? r.top : r.bottom - bw;
+      pdf.rect(MM(r.left - pr.left), MM(yy - pr.top), MM(r.width), MM(bw), 'F');
+    }
+  }
 }
 function drawInlineBoxes(ctx, root) {
   const pdf = ctx.pdf, pr = ctx.pr;
@@ -380,8 +437,7 @@ function drawInlineBoxes(ctx, root) {
     const rad = parseFloat(cs.borderTopLeftRadius) || 0;
     for (const r of rects) {
       const x = r.left - pr.left, y = r.top - pr.top;
-      if (rad > 0.5) pdf.roundedRect(MM(x), MM(y), MM(r.width), MM(r.height), MM(rad), MM(rad), 'F');
-      else pdf.rect(MM(x), MM(y), MM(r.width), MM(r.height), 'F');
+      fillRound(pdf, x, y, r.width, r.height, rad);
     }
     if (n.tagName === 'MARK' && n.classList.contains('sel')) {
       const fs = parseFloat(cs.fontSize) || 18;
@@ -438,8 +494,10 @@ function drawWords(ctx, root) {
       if (!f) { flush(); continue; }
       const top = rc.top - pr.top;
       if (run && (Math.abs(run.top - top) > 0.6 || run.f.id !== f.id)) flush();
-      if (!run) run = { text: '', x: rc.left - pr.left, top, f, fs, col, ls, up };
+      if (!run) run = { text: '', x: rc.left - pr.left, top, f, fs, col, ls, up, n: 0 };
       run.text += ch;
+      run.n++;
+      run.x1 = rc.right - pr.left;
     }
     flush();
   }
@@ -451,5 +509,14 @@ function emitRun(ctx, run) {
   pdf.setTextColor(run.col[0], run.col[1], run.col[2]);
   const str = run.up ? run.text.toLocaleUpperCase('fr-FR') : run.text;
   const base = run.top + FAM[run.f.fam].asc * run.fs;
-  pdf.text(str, MM(run.x), MM(base), { baseline: 'alphabetic', charSpace: run.ls ? MM(run.ls) : 0 });
+  // le PDF n'applique pas le crénage : on recale l'approche pour retrouver la largeur mesurée à l'écran
+  let cs = run.ls ? MM(run.ls) : 0;
+  const n = [...str].length;
+  if (n > 1 && run.x1 > run.x) {
+    const target = MM(run.x1 - run.x - (run.ls || 0));
+    const fit = (target - pdf.getTextWidth(str)) / (n - 1);
+    const lim = MM(run.fs) * 0.12;
+    if (Math.abs(fit) < lim) cs = fit;
+  }
+  pdf.text(str, MM(run.x), MM(base), { baseline: 'alphabetic', charSpace: cs });
 }

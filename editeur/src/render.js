@@ -27,18 +27,42 @@ function renderPage(page, mode = 'edit', index = pageIndex(page.id)) {
   return pg;
 }
 
+/* Limites horizontales de l'en-tête et du pied de page : ils s'arrêtent avant une
+   photo pleine hauteur, et disparaissent sur une photo pleine page. */
+function chromeBounds(page) {
+  let x0 = ML, x1 = PW - MR, full = false;
+  for (const el of page.els) {
+    if (!(el.t === 'image' || el.t === 'video' || el.t === 'shape') || el.r) continue;
+    if (el.y > 0 || el.y + el.h < PH) continue;
+    if (el.x <= 0 && el.x + el.w >= PW) { full = true; continue; }
+    if (el.x <= 0) x0 = Math.max(x0, el.x + el.w + ML);
+    else if (el.x + el.w >= PW) x1 = Math.min(x1, el.x - MR);
+  }
+  return { x0, x1, full: full || x1 - x0 < 240 };
+}
 function renderChrome(page, index, mode) {
   const box = h('div', { class: 'chrome' });
   const ch = page.chrome || {};
+  if (index <= 0) return box;
   const dark = isDark(page.bg || '#FFFFFF');
-  const col = dark ? '#BDBAB3' : '#6B6862';
-  if (ch.header !== false && index > 0) {
+  const b = chromeBounds(page);
+  const total = S.meta ? S.meta.order.length : 0;
+  const ink = dark ? '#F5F5F7' : C.ink, sub = dark ? '#A1A1A6' : C.sub, hair = dark ? C.darkHair : C.hair;
+  if (ch.header !== false && !b.full) {
     const chap = chapterOf(page.chapter);
-    const label = `${(S.meta && S.meta.brand) || 'Sarments'} · ${chap.id === 'ouv' ? (page.name || '') : chap.name}`;
-    box.append(h('div', { class: 'ch-head', style: { color: col } }, h('i', { class: 'tri', style: { borderLeftColor: dark ? '#FFFFFF' : C.ink } }), h('span', null, label)));
+    const label = chap.id === 'ouv' ? (page.name || '') : chap.name;
+    box.append(h('div', { class: 'ch-head', style: { left: b.x0 + 'px', width: (b.x1 - b.x0) + 'px', color: sub } },
+      h('i', { class: 'tri', style: { borderLeftColor: ink } }),
+      h('b', { style: { color: ink } }, (S.meta && S.meta.brand) || 'Sarments'),
+      h('span', null, label),
+      chap.num ? h('em', null, chap.num) : null));
+    box.append(h('div', { class: 'ch-rule', style: { left: b.x0 + 'px', top: '62px', width: (b.x1 - b.x0) + 'px', background: hair } }));
   }
-  if (ch.folio !== false && index > 0) {
-    box.append(h('div', { class: 'ch-folio', style: { color: col } }, String(index + 1).padStart(2, '0')));
+  if (ch.folio !== false && !b.full) {
+    box.append(h('div', { class: 'ch-rule', style: { left: b.x0 + 'px', top: '1118px', width: (b.x1 - b.x0) + 'px', background: hair } }));
+    box.append(h('div', { class: 'ch-foot', style: { left: b.x0 + 'px', width: (b.x1 - b.x0) + 'px', color: sub } },
+      h('span', null, 'Dossier de projet'),
+      h('span', null, h('b', { style: { color: ink } }, String(index + 1).padStart(2, '0')), total ? ' / ' + String(total).padStart(2, '0') : '')));
   }
   return box;
 }
@@ -86,16 +110,21 @@ function renderText(d, inn, el, page, index) {
   st.fontStyle = s.it ? 'italic' : 'normal';
   st.textTransform = s.up ? 'uppercase' : 'none';
   st.textAlign = s.al || 'left';
-  const onBox = s.box === 'sel' || (s.box === 'fill' && !isDark(s.bg || C.warm));
-  st.color = s.col || (onBox ? C.ink : (dark ? '#FFFFFF' : C.ink));
-  if (s.box === 'sel' || s.box === 'fill') {
+  const filled = s.box === 'sel' || s.box === 'fill';
+  const surface = filled ? (s.bg || (s.box === 'sel' ? C.sel : C.card)) : (page.bg || '#FFFFFF');
+  const sd = isDark(surface);
+  const tone = s.tone === 'sub' ? (sd ? '#A1A1A6' : C.sub) : s.tone === 'blue' ? (sd ? '#5AAEFF' : C.blue) : null;
+  st.color = s.col || tone || (sd ? '#F5F5F7' : C.ink);
+  if (sd) d.classList.add('on-dark');
+  if (filled) {
     d.classList.add('box-' + s.box);
-    st.backgroundColor = s.bg || (s.box === 'sel' ? C.sel : C.warm);
+    st.backgroundColor = surface;
     st.padding = `${s.pad[0]}px ${s.pad[1]}px`;
+    if (s.rad) st.borderRadius = s.rad + 'px';
   } else if (s.box === 'rule') {
     d.classList.add('box-rule');
-    st.borderTop = `2px solid ${s.col || (dark ? '#FFFFFF' : C.ink)}`;
-    st.paddingTop = '14px';
+    st.borderTop = `1.5px solid ${s.col || (sd ? '#F5F5F7' : C.ink)}`;
+    st.paddingTop = '16px';
   }
   if (el.autoH === false) {
     d.classList.add('fixed-h');
@@ -122,6 +151,7 @@ function tocHTML() {
 
 function renderImage(d, inn, el, mode) {
   const url = imgURL(el.src);
+  if (el.rad) inn.style.borderRadius = el.rad + 'px';
   if (!url) {
     d.classList.add('empty');
     inn.className = 'in ph';
@@ -155,6 +185,7 @@ function renderShape(d, inn, el) {
 
 function renderVideo(d, inn, el, mode) {
   inn.className = 'in vid';
+  if (el.rad) inn.style.borderRadius = el.rad + 'px';
   const src = imgURL(el.src), poster = imgURL(el.poster);
   if (mode === 'export' || !src) {
     if (!src) { d.classList.add('empty'); inn.className = 'in ph'; inn.append(h('div', { class: 'ph-in' }, h('span', { class: 'ph-t' }, 'Vidéo'))); }
