@@ -3615,10 +3615,10 @@ async function saveFile(filename, blob) {
 }
 async function exportBackup() {
   const pages = S.meta.order.map(id => clone(S.pages.get(id))).filter(Boolean);
-  // les images gardées dans le navigateur sont intégrées au fichier
+  // les photos importées sont intégrées au fichier : la sauvegarde se rouvre partout
   for (const p of pages) for (const el of p.els) for (const k of ['src', 'poster']) {
     const ref = el[k];
-    if (ref && /^(idb|mem):/.test(ref)) {
+    if (ref && /^(idb|mem|asset):/.test(ref)) {
       try { const b = await (await fetch(imgURL(ref))).blob(); el[k] = await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(b); }); } catch (e) {}
     }
   }
