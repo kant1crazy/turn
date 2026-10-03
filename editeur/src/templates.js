@@ -1,11 +1,12 @@
 /* ==========================================================================
-   Modèle « SARMENTS » (version 3) : Minion, aucun filet, de l'air.
+   Modèle « SARMENTS » (version 4) : Minion, aucun filet, de l'air, grands titres.
    Toutes les positions sont en px de page (A3 paysage 1680 × 1188).
-   Trame : surtitre et titre en haut (y 104), contenu à partir de y 344,
+   Trame : surtitre et titre en haut (y 104), contenu à partir de y 404,
    « À retenir » posé sur le bas (y 1084). Les cartes prennent la hauteur
    de leur contenu : le blanc autour fait partie de la mise en page.
    ========================================================================== */
-const TPL_VERSION = 3;
+const TPL_VERSION = 4;
+const TPL_NOTE = 'Titres plus grands, toujours en Minion et sans filets';
 const IMG = {
   pile: { src: 'img/pile.jpg', nw: 1977, nh: 876 },
   mains: { src: 'img/mains.jpg', nw: 1645, nh: 2400 },
@@ -22,7 +23,8 @@ const IMG = {
 };
 
 /* Trame verticale et colonnes */
-const Y0 = 104, YT = 132, YC = 344, YB = 1084, RAD = 28, GAP = 24;
+const Y0 = 104, YT = 134, YC = 404, YB = 1084, RAD = 28, GAP = 24;
+const HC = YB - YC, HH2 = (HC - GAP) / 2; // hauteur de la zone de contenu, et d'une demi-zone
 const X2 = [cx(1), cx(7)], W2 = cw(6);
 const X3 = [cx(1), cx(5), cx(9)], W3 = cw(4);
 const X4 = [cx(1), cx(4), cx(7), cx(10)], W4 = cw(3);
@@ -123,29 +125,31 @@ function boxRow(items, pad = 32) {
 
 /* ---------------------------------------------------------------- blocs réutilisés */
 function opener(chapter, beat, num, a, b, list, bgEls = [], o = {}) {
-  const x = o.x == null ? ML : o.x, w = o.tw || 756;
+  const x = o.x == null ? ML : o.x, w = o.tw || 820;
   return PAGE(chapter, beat, 'Ouverture · ' + chapterOf(chapter).name, [
     ...bgEls,
     T(num, x, 92, 400, 'num', { fs: 150, col: o.numCol || C.handle }),
-    TITLE(a, b, x, 668, w, 'h1', o.tfs ? { fs: o.tfs } : {}),
+    TITLE(a, b, x, 626, w, 'h1', o.tfs ? { fs: o.tfs } : {}),
     T(PILLS(list), x, 990, w, 'body', { fs: 15.5, anim: { type: 'fade' } })
   ], { header: false, folio: false, bg: o.bg, notes: o.notes });
 }
 
 function fiche(d) {
+  const name = T(d.name, 592, YT - 4, 836, 'h2', { fs: 92 });
+  const place = T(d.place, 592, YT - 4 + natH(name) + 8, 836, 'small');
+  const y0 = place.y + natH(place) + 40;
   const info = [
-    T(FIELDS([['Positionnement', d.pos], ['Canaux & communication', d.canaux]]), 630, 326, 444, 'body', { fs: 16.5 }),
-    T(FIELDS([['Cible', d.cible], ['Prix', d.prix], ['Identité visuelle', d.ident || 'À compléter : palette, typographie, ton.']]), 1130, 326, 444, 'body', { fs: 16.5 })
+    T(FIELDS([['Positionnement', d.pos], ['Canaux & communication', d.canaux]]), 630, y0 + 36, 444, 'body', { fs: 16.5 }),
+    T(FIELDS([['Cible', d.cible], ['Prix', d.prix], ['Identité visuelle', d.ident || 'À compléter : palette, typographie, ton.']]), 1130, y0 + 36, 444, 'body', { fs: 16.5 })
   ];
-  const box = BOX(592, 290, 1016, Math.max(...info.map(e => natH(e))) + 72);
+  const box = BOX(592, y0, 1016, Math.max(...info.map(e => natH(e))) + 72);
   const top = box.y + box.h + GAP;
   const els = [
     d.photo ? I(d.photo, 72, Y0, 496, 616) : FRAME('Photo produit principale', 72, Y0, 496, 616),
     FRAME('Photo produit', 72, 744, 236, 340),
     FRAME('Photo d\'ambiance ou de communication', 332, 744, 236, 340),
     T(d.type, 592, Y0, 700, 'eyebrow'),
-    T(d.name, 592, YT, 820, 'h2', { fs: 66 }),
-    T(d.place, 592, 216, 820, 'small'),
+    name, place,
     FRAME('Logo', 1448, Y0, 160, 96),
     box, ...info,
     ...rowEq([CARD(K('Force', 'green') + `<p>${d.force}</p>`, 592, top, 496, null, { bg: C.cardGreen }),
@@ -156,14 +160,16 @@ function fiche(d) {
 }
 function persona(d) {
   const f = d.fields;
+  const name = T(d.name, 592, YT - 4, 1016, 'h2', { fs: 92 });
+  const meta = T(d.meta, 592, YT - 4 + natH(name) + 8, 1016, 'small');
+  const quote = T('« ' + d.quote + ' »', 592, meta.y + natH(meta) + 34, 1016, 'quote', { fs: 32 });
+  const fy = quote.y + natH(quote) + 56;
   const els = [
     FRAME('Portrait libre de droits (Unsplash, Pexels…)', 72, Y0, 496, 980),
     T(d.tag, 592, Y0, 1016, 'eyebrow'),
-    T(d.name, 592, YT, 1016, 'h2', { fs: 66 }),
-    T(d.meta, 592, 216, 1016, 'small'),
-    T('« ' + d.quote + ' »', 592, 290, 1016, 'quote', { fs: 32 }),
-    T(FIELDS(f.slice(0, 3)), 592, 440, 480, 'body', { fs: 16.5 }),
-    T(FIELDS(f.slice(3)), 1112, 440, 480, 'body', { fs: 16.5 }),
+    name, meta, quote,
+    T(FIELDS(f.slice(0, 3)), 592, fy, 480, 'body', { fs: 16.5 }),
+    T(FIELDS(f.slice(3)), 1112, fy, 480, 'body', { fs: 16.5 }),
     KEEPB(d.brings, 592, 1016, { label: 'Ce que Sarments lui apporte' })
   ];
   return PAGE('c5', '7 · B Story', 'Persona · ' + d.name, els, { notes: 'Persona : ajoute un portrait libre de droits. Un persona ne garde qu\'une option par champ.' });
@@ -174,7 +180,7 @@ function axePages(n, name, a, b, mb, intent, kw, marche, manque, keep, beat, two
     I(mb, 900, 0, 780, 1188, { lock: true, anim: { type: 'reveal' } }),
     T(`Axe ${n}`, 72, Y0, 600, 'eyebrow'),
     TITLE(a, b, 72, YT, 756, 'h1'),
-    T(intent, 72, 440, 700, 'lead', { fs: 29 }),
+    T(intent, 72, 476, 700, 'lead', { fs: 29 }),
     T(PILLS(kw.split(' · ')), 72, 990, 756, 'body', { fs: 15.5 })
   ], { notes: 'Remplace le moodboard par l\'image la plus forte de l\'axe.' }));
   const right = (x, top) => {
@@ -184,23 +190,23 @@ function axePages(n, name, a, b, mb, intent, kw, marche, manque, keep, beat, two
   };
   if (two) {
     pages.push(PAGE('c6', beat, `Axe ${n} · Recherches & bilan`, [
-      ...HEAD(`Axe ${n} · Recherches & bilan`, name, null, { w: 1016, t: { fs: 60 } }),
-      FRAME('Croquis de logo', 72, YC, 496, 340), FRAME('Essais typographiques', 592, YC, 496, 340),
-      FRAME('Motifs & textures', 72, 708, 496, 376), FRAME('Mise en situation', 592, 708, 496, 376),
+      ...HEAD(`Axe ${n} · Recherches & bilan`, name, null, { w: 1016, t: { fs: 100 } }),
+      FRAME('Croquis de logo', 72, YC, 496, HH2), FRAME('Essais typographiques', 592, YC, 496, HH2),
+      FRAME('Motifs & textures', 72, YC + HH2 + GAP, 496, HH2), FRAME('Mise en situation', 592, YC + HH2 + GAP, 496, HH2),
       ...right(1112, YC)
     ]));
     return pages;
   }
   pages.push(PAGE('c6', beat, `Axe ${n} · Recherches`, [
-    ...HEAD(`Axe ${n} · Recherches`, name, null, { w: 756, t: { fs: 60 } }),
+    ...HEAD(`Axe ${n} · Recherches`, name, null, { w: 756, t: { fs: 100 } }),
     T('Notes de recherche : à compléter.', 852, 150, 756, 'body', { tone: 'sub' }),
-    FRAME('Croquis de logo', X3[0], YC, W3, 340), FRAME('Essais typographiques', X3[1], YC, W3, 340), FRAME('Motifs & textures', X3[2], YC, W3, 340),
-    FRAME('Palette & essais couleur', 72, 708, 496, 376), FRAME('Déclinaison test', 592, 708, 1016, 376)
+    FRAME('Croquis de logo', X3[0], YC, W3, HH2), FRAME('Essais typographiques', X3[1], YC, W3, HH2), FRAME('Motifs & textures', X3[2], YC, W3, HH2),
+    FRAME('Palette & essais couleur', 72, YC + HH2 + GAP, 496, HH2), FRAME('Déclinaison test', 592, YC + HH2 + GAP, 1016, HH2)
   ]));
   pages.push(PAGE('c6', beat, `Axe ${n} · Bilan`, [
     FRAME('Mise en situation : étiquette, post Instagram, packaging…', 72, Y0, 1016, 980),
     T(`Axe ${n} · Bilan`, 1112, Y0, 496, 'eyebrow'),
-    T(name, 1112, YT, 496, 'h2', { fs: 52 }),
+    T(name, 1112, YT, 496, 'h2', { fs: 66 }),
     ...right(1112, YC)
   ]));
   return pages;
@@ -266,7 +272,7 @@ function buildDossier() {
   // 1 · Opening Image : Brief
   P.push(PAGE('c1', '1 · Opening Image', 'Brief', [
     T('Le brief', 72, Y0, 756, 'eyebrow'),
-    T('Créer une marque à partir d\'une matière première en <mark class="sel">seconde vie</mark>.', 72, YT, 756, 'h2', { fs: 64, lh: 1.08 }),
+    T('<p>Créer une marque</p><p>à partir d\'une</p><p>matière première</p><p>en <mark class="sel">seconde vie</mark>.</p>', 72, YT, 800, 'h2', { fs: 92, lh: 1.02 }),
     ...rowBottom([
       CARD(K('Le projet') + TT('Du rang de vigne à la lampe') + '<p>SARMENTS transforme le sarment de vigne, coproduit brûlé ou broyé chaque hiver, en luminaires artisanaux. Le sarment est conservé entier et tracé jusqu\'à son domaine d\'origine, en Nouvelle-Aquitaine.</p>', 72, 0, 366),
       CARD(K('Les attentes') + TT('Une marque complète') + '<p>Une plateforme de marque, une identité visuelle (logo, charte graphique) et ses déclinaisons : étiquette de traçabilité, packaging, réseaux sociaux, site.</p>', 462, 0, 366)]),
@@ -276,7 +282,7 @@ function buildDossier() {
   // 2 · Theme Stated : Problématique
   P.push(PAGE('c1', '2 · Theme Stated', 'Problématique', [
     T('Problématique', 72, Y0, 600, 'eyebrow'),
-    T('Comment le design peut-il transformer les <mark class="sel">irrégularités naturelles</mark> du sarment de vigne, aujourd\'hui brûlé ou broyé, en qualités esthétiques et fonctionnelles pour créer un <mark class="sel">luminaire artisanal contemporain</mark> ?', 72, YT, 1450, 'lead', { fs: 68, lh: 1.15 }),
+    T('Comment le design peut-il transformer les <mark class="sel">irrégularités naturelles</mark> du sarment de vigne, aujourd\'hui brûlé ou broyé, en qualités esthétiques et fonctionnelles pour créer un <mark class="sel">luminaire artisanal contemporain</mark> ?', 72, YT, 1480, 'lead', { fs: 76, lh: 1.12 }),
     ...rowBottom([['01', 'Matière', 'Les nœuds, l\'écorce et les courbes du sarment deviennent une signature visuelle.'],
       ['02', 'Geste', 'La main qui récolte, cintre et assemble reste visible dans l\'objet.'],
       ['03', 'Lumière', 'La lumière révèle le sarment et projette son dessin dans la pièce.']]
@@ -292,7 +298,7 @@ function buildDossier() {
     const stats = rowEq([
       CARD('<p class="n">2 t</p><p class="s">de sarments par hectare et par an</p>', 852, YC, 366),
       CARD('<p class="n">1,6 Mt</p><p class="s">de coproduits viticoles chaque année en France</p>', 1242, YC, 366)]);
-    const dy = YC + stats[0].h + GAP, dh = 300;
+    const dy = YC + stats[0].h + GAP, dh = 280;
     P.push(PAGE('c2', '3 · Set-Up', 'Analyse contextuelle', [
       ...HEAD('Contexte', 'Analyse', 'contextuelle'),
       T('La viticulture française produit plus de 2 tonnes de sarments par hectare et par an, générés lors de la taille et de l\'épamprage. Cette biomasse est aujourd\'hui majoritairement brûlée, broyée ou compostée et rarement valorisée comme matière noble. À l\'échelle nationale, la filière génère plus de 1,6 million de tonnes de coproduits agricoles par an, dont 93 % de sarments.', 852, 140, 756, 'body'),
@@ -308,13 +314,13 @@ function buildDossier() {
 
   {
     const months = ['Nov', 'Déc', 'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct'];
-    const u = 684 / 12, x0 = 888, cy = 690;
+    const u = 684 / 12, x0 = 888, cy = 762;
     P.push(PAGE('c2', '3 · Set-Up', 'La ressource', [
       I('mains', 72, Y0, 756, 980, { fx: 0.5, fy: 0.45, lock: true, anim: { type: 'reveal' } }),
       T('Sarment broyé : l\'usage d\'aujourd\'hui', 104, 1040, 600, 'caption', { col: '#FFFFFF' }),
       T('La ressource', 852, Y0, 756, 'eyebrow'),
-      T('Une ressource disponible, gratuite et en quête de <mark class="sel">débouchés</mark>', 852, YT, 756, 'h2', { fs: 56 }),
-      T('<p>Les alternatives officiellement recommandées sont le broyage, le compostage, le paillage ou l\'apport en déchèterie. Aucune de ces solutions ne valorise économiquement la matière. La collecte se fait traditionnellement de novembre à mars, période de taille.</p><p>La ressource est abondante, récurrente, disponible gratuitement ou à très faible coût, et les producteurs sont en recherche active de débouchés depuis le durcissement des règles anti-brûlage. Le rapport de force à l\'approvisionnement est favorable à un porteur de projet.</p>', 852, 300, 756, 'body'),
+      T('Une ressource disponible, gratuite et en quête de <mark class="sel">débouchés</mark>', 852, YT, 756, 'h2', { fs: 80 }),
+      T('<p>Les alternatives officiellement recommandées sont le broyage, le compostage, le paillage ou l\'apport en déchèterie. Aucune de ces solutions ne valorise économiquement la matière. La collecte se fait traditionnellement de novembre à mars, période de taille.</p><p>La ressource est abondante, récurrente, disponible gratuitement ou à très faible coût, et les producteurs sont en recherche active de débouchés depuis le durcissement des règles anti-brûlage. Le rapport de force à l\'approvisionnement est favorable à un porteur de projet.</p>', 852, 420, 756, 'body'),
       BOX(852, cy - 42, 756, 190),
       T(K('Le calendrier de la matière'), x0, cy - 8, 600, 'body'),
       ...months.map((m, i) => T(m, x0 + i * u, cy + 30, u, 'label', { fs: 12, anim: { type: 'none' } })),
@@ -366,12 +372,12 @@ function buildDossier() {
   }
 
   P.push(PAGE('c2', '3 · Set-Up', 'Petite et grande échelle', [
-    ...HEAD('Valorisation', 'Les voies de valorisation', '« nobles »', { w: 1016 }),
+    ...HEAD('Valorisation', 'Les voies de valorisation', '« nobles »', { w: 1016, t: { fs: 92 } }),
     T('Les voies de valorisation « nobles » (énergie, matériaux composites, mobilier, cosmétique) existent et sont documentées depuis les années 2010-2015 par les instituts techniques de la filière, mais restent à l\'état de niches.', 72, YC, 496, 'body'),
     T('Le gisement mobilisable est qualifié de faible par les organismes du secteur eux-mêmes, non pas parce que la matière manque, mais parce que les filières de collecte, de transport et de transformation ne sont pas structurées à grande échelle : chaque tentative reste artisanale ou expérimentale.', 592, YC, 496, 'body'),
     ...rowEq([
-      CARD(K('Petite échelle', 'green') + TT('Facile d\'entrer') + ROWS(['+ Peu de concurrence', '+ Matière accessible', '+ Pas de barrière financière à l\'approvisionnement']), 72, 600, 496, null, { bg: C.cardGreen }),
-      CARD(K('Grande échelle', 'brown') + TT('Difficile d\'industrialiser') + ROWS(['− Pas de logistique de collecte organisée', '− Matière hétérogène', '− Faible valeur économique au kilo']), 592, 600, 496, null, { bg: C.cardBrown })]),
+      CARD(K('Petite échelle', 'green') + TT('Facile d\'entrer') + ROWS(['+ Peu de concurrence', '+ Matière accessible', '+ Pas de barrière financière à l\'approvisionnement']), 72, 640, 496, null, { bg: C.cardGreen }),
+      CARD(K('Grande échelle', 'brown') + TT('Difficile d\'industrialiser') + ROWS(['− Pas de logistique de collecte organisée', '− Matière hétérogène', '− Faible valeur économique au kilo']), 592, 640, 496, null, { bg: C.cardBrown })]),
     KEEPB('Facile d\'entrer à petite échelle, difficile d\'industrialiser : le modèle artisanal est le bon point de départ.', 72, 1016),
     I('fagots', 1112, Y0, 496, 980, { lock: true, anim: { type: 'reveal' } })
   ]));
@@ -400,7 +406,7 @@ function buildDossier() {
     ...rowEq([
       CARD('<p class="n">−1,7 %</p><p class="s">Lampes et luminaires en France : 4,165 Md€ en 2022, 4,094 Md€ en 2023 (Syndicat du luminaire).</p>', 72, YC, 496, null, { fs: 19 }),
       CARD('<p class="n acc">+7,7 %</p><p class="s">par an : croissance attendue du luminaire haut de gamme dans le monde jusqu\'en 2034 (20,26 Md$ en 2024).</p>', 592, YC, 496, null, { fs: 19 })]),
-    T(K('Tendance', 'g') + '<p>Les acteurs misent sur les matériaux durables pour se repositionner. La part grand public est plus petite : la consommation des ménages en appareils d\'éclairage était de 790 M€ en 2021.</p>', 72, 700, 1016, 'body'),
+    T(K('Tendance', 'g') + '<p>Les acteurs misent sur les matériaux durables pour se repositionner. La part grand public est plus petite : la consommation des ménages en appareils d\'éclairage était de 790 M€ en 2021.</p>', 72, 740, 1016, 'body'),
     KEEPB('Le haut de gamme progresse (+7,7 %/an) pendant que le grand public recule (−1,7 %) : la place est du côté du luminaire durable et premium.', 72, 1016),
     I('lampes', 1112, Y0, 496, 900),
     atBottom(T('Le naturel standardisé de la grande distribution : notre contre-modèle.', 1112, 0, 496, 'caption'))
@@ -436,8 +442,8 @@ function buildDossier() {
         ['Fibres naturelles', 'Bois, rotin, osier, papier, tissu : surtout pour les abat-jour et les modèles « naturels ».', 'Photo : abat-jour en fibres naturelles']]
         .map(([t, d, ph], i) => ({
           box: BOX(X4[i], YC, W4, 100),
-          extra: [FRAME(ph, X4[i] + 14, YC + 14, W4 - 28, 200, { rad: 18 })],
-          text: T(TT(t) + `<p class="s">${d}</p>`, X4[i] + 32, YC + 240, W4 - 64, 'body', { fs: 16 })
+          extra: [FRAME(ph, X4[i] + 14, YC + 14, W4 - 28, 176, { rad: 18 })],
+          text: T(TT(t) + `<p class="s">${d}</p>`, X4[i] + 32, YC + 214, W4 - 64, 'body', { fs: 16 })
         })))),
       list,
       T('Et la demande suit : le luminaire haut de gamme progresse de plus de 7,7 % par an dans le monde, et les fabricants misent sur les matériaux durables pour se repositionner.', 852, YC + mats[0].h + 48, 756, 'lead', { fs: 25 }),
@@ -522,7 +528,7 @@ function buildDossier() {
       ...dots.flatMap(([n, x, y]) => { const [px, py] = pt(x, y); return [ELL(px - 9, py - 9, 18, 18, C.ink), T(n, px + 18, py - 13, 260, 'body', { fs: 17, anim: { type: 'none' } })]; }),
       ELL(sx - 16, sy - 16, 32, 32, C.handle, { anim: { type: 'zoom' } }), T('Sarments', sx - 270, sy - 10, 244, 'eyebrow', { al: 'right', fs: 15 }),
       T('Positionnement', 1112, Y0, 496, 'eyebrow'),
-      TITLE('Croix de', 'positionnement', 1112, YT, 496, 'h2', { fs: 60 }),
+      TITLE('Croix de', 'positionnement', 1112, YT, 496, 'h2', { fs: 66 }),
       T('Deux axes : le lien avec la vigne (de la matière anonyme au sarment tracé jusqu\'à son domaine) et le mode de production (de la série industrielle à la pièce unique). Les points se déplacent : ajuste-les avec vos fiches.', 1112, YC, 496, 'body'),
       KEEPB('Seul acteur à relier un sarment conservé entier à son domaine d\'origine, en production artisanale.', 1112, 496)
     ]));
@@ -537,7 +543,7 @@ function buildDossier() {
   // 6 · Break into Two : Concept
   P.push(opener('c5', '6 · Break into Two', '05', 'Concept &', 'plateforme de marque', ['Concept', 'Process', 'Mission & valeurs', 'Cibles', 'Personas', 'SWOT', 'Mix marketing', 'Nom'],
     [I('mains', 0, 0, 1680, 1188, { gray: true, fy: 0.4, lock: true, anim: { type: 'zoom' } }), R(0, 0, 1680, 1188, '#000000', { o: 0.55, lock: true })],
-    { bg: C.dark, numCol: '#FFFFFF', tw: 1300, tfs: 112 }));
+    { bg: C.dark, numCol: '#FFFFFF', tw: 1450, tfs: 132 }));
   P.push(PAGE('c5', '6 · Break into Two', 'Le sarment reste sarment', [
     T('Le concept', 72, Y0, 1536, 'eyebrow', { al: 'center' }),
     T('<mark class="sel">Le sarment reste sarment</mark>', 72, YT, 1536, 'h2', { al: 'center' }),
@@ -562,8 +568,8 @@ function buildDossier() {
         const x = 72 + i * 312;
         return {
           box: BOX(x, YC, 288, 100),
-          extra: [FRAME(`Photo : étape ${i + 1}`, x + 12, YC + 12, 264, 220, { rad: 18 })],
-          text: T(K('Étape ' + String(i + 1).padStart(2, '0')) + `<p class="t">${t}</p><p class="s">${d}</p>`, x + 26, YC + 256, 236, 'body', { fs: 15.5 })
+          extra: [FRAME(`Photo : étape ${i + 1}`, x + 12, YC + 12, 264, 196, { rad: 18 })],
+          text: T(K('Étape ' + String(i + 1).padStart(2, '0')) + `<p class="t">${t}</p><p class="s">${d}</p>`, x + 26, YC + 232, 236, 'body', { fs: 15.5 })
         };
       }), 28),
       ...rowBottom([
@@ -583,7 +589,7 @@ function buildDossier() {
       ['Traçabilité', 'Chaque pièce est reliée à un domaine, un cépage et une période de récolte identifiables.'],
       ['Ancrage territorial', 'La marque s\'inscrit dans l\'économie viticole réelle de la Nouvelle-Aquitaine.'],
       ['Équité', 'La matière des vignerons partenaires est reconnue et valorisée, pas traitée comme une ressource gratuite et invisible.']]
-      .map(([t, d], i) => CARD(K('Valeur ' + String(i + 1).padStart(2, '0')) + TT(t) + `<p class="s">${d}</p>`, X4[i], 470, W4))),
+      .map(([t, d], i) => CARD(K('Valeur ' + String(i + 1).padStart(2, '0')) + TT(t) + `<p class="s">${d}</p>`, X4[i], 516, W4))),
     ...rowBottom([
       CARD(K('Objectif · court terme', 'g') + '<p>Se concentrer sur le pied de lampe : une typologie, un savoir-faire, un cycle de production.</p>', 72, 0, 756, null, { fs: 19 }),
       CARD(K('Objectif · long terme', 'g') + '<p>Étendre la marque au petit mobilier et aux accessoires de décoration.</p>', 852, 0, 756, null, { fs: 19 })])
@@ -593,7 +599,7 @@ function buildDossier() {
     const ring = (d, fill) => ELL(ccx - d / 2, ccy - d / 2, d, d, fill, { lock: true });
     const lab = (a, b, y, w = 400) => T(`${a}<br><span class="s">${b}</span>`, ccx - w / 2, y, w, 'small', { al: 'center', tone: null, anim: { type: 'none' } });
     P.push(PAGE('c5', '7 · B Story', 'Positionnement & cibles', [
-      ...HEAD('Plateforme de marque', 'Positionnement', '& cibles', { t: { fs: 70 } }),
+      ...HEAD('Plateforme de marque', 'Positionnement', '& cibles'),
       T('Pour les amateurs de design local en Nouvelle-Aquitaine et, à terme, les domaines viticoles, SARMENTS est l\'artisan qui transforme le sarment de vigne brut, tracé jusqu\'au domaine d\'origine, en luminaires utilitaires et décoratifs. Contrairement aux acteurs existants, qui travaillent soit d\'autres bois du vignoble (Niko & Co), soit un matériau composite coupé du geste artisanal (Les Princes Sarments, Vitis Valorem), SARMENTS conserve le sarment dans sa forme naturelle.', 72, YC, 720, 'body', { fs: 19 }),
       KEEPB('Cœur de cible : les 25-45 ans qui achètent une histoire plus qu\'une lampe.', 72, 756),
       BOX(852, Y0, 756, 980, C.card, { lock: true }),
@@ -697,9 +703,9 @@ function buildDossier() {
       ...pal.flatMap(([hex, n], j) => [R(72 + j * (sw + 16), 846, sw, 132, hex, { rad: 18, anim: { type: 'none' } }),
         T(`${n}<br>${hex}`, 72 + j * (sw + 16), 994, sw, 'caption', { anim: { type: 'none' } })]),
       T(`Moodboard ${i + 1} · Axe ${i + 1}`, 1112, Y0, 496, 'eyebrow'),
-      TITLE(a, b, 1112, YT, 496, 'h2', { fs: 60 }),
-      T(PILLS(kw.split(' · ')), 1112, 310, 496, 'body', { fs: 14.5, anim: { type: 'none' } }),
-      T(txt, 1112, 440, 496, 'body'),
+      TITLE(a, b, 1112, YT, 496, 'h2', { fs: 88 }),
+      T(PILLS(kw.split(' · ')), 1112, 356, 496, 'body', { fs: 14.5, anim: { type: 'none' } }),
+      T(txt, 1112, 480, 496, 'body'),
       KEEPB(keep, 1112, 496)
     ], { notes: 'Références réunies pour l\'axe ' + (i + 1) + '. Palette extraite des images.' }));
   });
@@ -721,7 +727,7 @@ function buildDossier() {
     KEEPB('À compléter : la piste retenue et pourquoi.', 72, 1536)
   ], { notes: 'Remplace les « Aa » par vos vrais essais (captures ou textes dans la police choisie).' }));
   {
-    const hh = 214;
+    const hh = 198;
     P.push(PAGE('c6', '8 · Fun and Games', 'Recherches chromatiques', [
       ...HEAD('Couleur', 'Recherches', 'chromatiques', { w: 1016 }),
       T('Une palette par axe, extraite des moodboards.', 1112, 150, 496, 'body', { tone: 'sub' }),
@@ -749,7 +755,7 @@ function buildDossier() {
   P.push(PAGE('c6', '12 · Dark Night of the Soul', 'Axe final', [
     FRAME('Logo final', 72, Y0, 1016, 980),
     T('Axe final', 1112, Y0, 496, 'eyebrow'),
-    T('<p>La ligne du sarment,</p><p><mark class="sel">révélée par la lumière</mark></p>', 1112, YT, 496, 'h2', { fs: 50 }),
+    T('<p>La ligne du sarment,</p><p><mark class="sel">révélée par</mark></p><p><mark class="sel">la lumière</mark></p>', 1112, YT, 496, 'h2', { fs: 62 }),
     T('La ligne vivante du sarment (axe 1) révélée par la lumière (axe 3), avec la trace de la main (axe 2) dans les textures et l\'étiquette. Proposition à valider.', 1112, YC, 496, 'body'),
     KEEPB('La réponse graphique à la problématique, en une image.', 1112, 496)
   ], { notes: 'Ce n\'est qu\'une proposition de synthèse : c\'est à vous de décider quel axe l\'emporte.' }));
@@ -760,7 +766,7 @@ function buildDossier() {
   P.push(PAGE('c7', '13 · Break into Three', 'Le logo', [
     ...HEAD('Charte graphique', 'Le', 'logo'),
     T('Construction, version monochrome, taille minimale : à compléter.', 852, 150, 756, 'body', { tone: 'sub' }),
-    FRAME('Logo principal', 72, YC, 1016, 740), FRAME('Version réduite', 1112, YC, 496, 358), FRAME('Zone de protection', 1112, YC + 382, 496, 358)
+    FRAME('Logo principal', 72, YC, 1016, HC), FRAME('Version réduite', 1112, YC, 496, HH2), FRAME('Zone de protection', 1112, YC + HH2 + GAP, 496, HH2)
   ]));
   P.push(PAGE('c7', '13 · Break into Three', 'Typographies', [
     ...HEAD('Charte graphique', 'Les', 'typographies'),
@@ -770,11 +776,11 @@ function buildDossier() {
     T('Aa', 104, YC + 70, 600, 'num', { fs: 230 }),
     T('ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>0123456789 € % « » ’ — …', 108, YC + 370, 684, 'lead', { fs: 27 }),
     T('Hiérarchie', 852, YC + 36, 600, 'eyebrow'),
-    T('Titre de page', 852, YC + 80, 756, 'h2', { fs: 64 }),
-    T('Chapeau, en grand, pour ouvrir une page.', 852, YC + 186, 756, 'lead'),
-    T('Texte courant : la Minion reste lisible en petit et garde de l\'élégance en grand. Un seul caractère pour tout le dossier, du titre à la légende.', 852, YC + 262, 680, 'body'),
-    T('Surtitre en capitales espacées', 852, YC + 372, 600, 'eyebrow'),
-    T('Légende · source · folio', 852, YC + 412, 600, 'caption')
+    T('Titre de page', 852, YC + 76, 756, 'h2'),
+    T('Chapeau, en grand, pour ouvrir une page.', 852, YC + 226, 756, 'lead'),
+    T('Texte courant : la Minion reste lisible en petit et garde de l\'élégance en grand. Un seul caractère pour tout le dossier, du titre à la légende.', 852, YC + 302, 680, 'body'),
+    T('Surtitre en capitales espacées', 852, YC + 412, 600, 'eyebrow'),
+    T('Légende · source · folio', 852, YC + 452, 600, 'caption')
   ]));
   P.push(PAGE('c7', '13 · Break into Three', 'Couleurs', [
     ...HEAD('Charte graphique', 'Les', 'couleurs'),
@@ -787,16 +793,16 @@ function buildDossier() {
     ...HEAD('Charte graphique', 'Motifs &', 'photographie'),
     FRAME('Motif 1', 72, YC, 366, 366), FRAME('Motif 2', 462, YC, 366, 366),
     T(K('Principe', 'g') + '<p>Les motifs viennent de la matière (cernes, nœuds, vrilles) ; la photographie montre le sarment dans la lumière.</p>', 72, YC + 410, 700, 'body', { fs: 19 }),
-    FRAME('Direction photo : lumière rasante, matière en gros plan', 852, YC, 756, 740)
+    FRAME('Direction photo : lumière rasante, matière en gros plan', 852, YC, 756, HC)
   ]));
   P.push(PAGE('c7', '13 · Break into Three', 'Règles d\'usage', [
     ...HEAD('Charte graphique', 'Règles', 'd\'usage'),
-    BOX(72, YC, 756, 700, C.cardGreen), BOX(852, YC, 756, 700, C.cardBrown),
+    BOX(72, YC, 756, 640, C.cardGreen), BOX(852, YC, 756, 640, C.cardBrown),
     T(K('À faire', 'green'), 108, YC + 34, 600, 'body'), T(K('À éviter', 'brown'), 888, YC + 34, 600, 'body'),
-    FRAME('Bon usage 1', 96, YC + 80, 342, 500, { rad: 18 }), FRAME('Bon usage 2', 462, YC + 80, 342, 500, { rad: 18 }),
-    FRAME('Mauvais usage 1', 876, YC + 80, 342, 500, { rad: 18 }), FRAME('Mauvais usage 2', 1242, YC + 80, 342, 500, { rad: 18 }),
-    T('Une ligne d\'explication sous chaque exemple.', 96, YC + 604, 342, 'small'), T('Une ligne d\'explication.', 462, YC + 604, 342, 'small'),
-    T('Une ligne d\'explication sous chaque exemple.', 876, YC + 604, 342, 'small'), T('Une ligne d\'explication.', 1242, YC + 604, 342, 'small')
+    FRAME('Bon usage 1', 96, YC + 80, 342, 446, { rad: 18 }), FRAME('Bon usage 2', 462, YC + 80, 342, 446, { rad: 18 }),
+    FRAME('Mauvais usage 1', 876, YC + 80, 342, 446, { rad: 18 }), FRAME('Mauvais usage 2', 1242, YC + 80, 342, 446, { rad: 18 }),
+    T('Une ligne d\'explication sous chaque exemple.', 96, YC + 552, 342, 'small'), T('Une ligne d\'explication.', 462, YC + 552, 342, 'small'),
+    T('Une ligne d\'explication sous chaque exemple.', 876, YC + 552, 342, 'small'), T('Une ligne d\'explication.', 1242, YC + 552, 342, 'small')
   ]));
 
   // 14 · Finale : déclinaisons
@@ -808,16 +814,16 @@ function buildDossier() {
     T(K(title, 'g') + `<p>${text}</p>`, 1112, YC, 496, 'body', { fs: 19 }),
     KEEPB(keep, 1112, 496)]);
   P.push(decl('Étiquette de traçabilité', 'L\'étiquette', 'L\'étiquette de', 'traçabilité',
-    [FRAME('Mockup étiquette : domaine, cépage, saison de taille, QR code', 72, YC, 1016, 740)],
+    [FRAME('Mockup étiquette : domaine, cépage, saison de taille, QR code', 72, YC, 1016, HC)],
     'Chaque pied de lampe porte le nom de son domaine, son cépage et sa saison de taille. Un QR code renvoie à l\'histoire de la pièce.', 'La traçabilité, rendue visible et tangible.'));
   P.push(decl('Packaging', 'Le packaging', 'Le', 'packaging',
-    [FRAME('Mockup packaging fermé', 72, YC, 496, 740), FRAME('Mockup packaging ouvert', 592, YC, 496, 740)],
+    [FRAME('Mockup packaging fermé', 72, YC, 496, HC), FRAME('Mockup packaging ouvert', 592, YC, 496, HC)],
     'À compléter : matériaux, format, ouverture, message à l\'intérieur.', 'À compléter : ce que le packaging raconte.'));
   P.push(decl('Site & réseaux', 'Site & réseaux', 'Site &', 'réseaux',
-    [FRAME('Maquette du site (ordinateur)', 72, YC, 640, 740), FRAME('Post Instagram', 736, YC, 352, 352), FRAME('Vidéo making-of : insère un MP4 avec l\'outil Vidéo', 736, YC + 376, 352, 364)],
+    [FRAME('Maquette du site (ordinateur)', 72, YC, 640, HC), FRAME('Post Instagram', 736, YC, 352, HH2), FRAME('Vidéo making-of : insère un MP4 avec l\'outil Vidéo', 736, YC + HH2 + GAP, 352, HH2)],
     'Instagram raconte le parcours du rang de vigne à la lampe ; le site relie chaque pièce à son domaine.', 'Du rang de vigne à la lampe, en images.'));
   P.push(decl('Boutique & salon', 'En situation', 'Boutique', '& salon',
-    [FRAME('Mise en situation : boutique de domaine', 72, YC, 1016, 358), FRAME('Stand de salon', 72, YC + 382, 496, 358), FRAME('Chambre d\'hôtes', 592, YC + 382, 496, 358)],
+    [FRAME('Mise en situation : boutique de domaine', 72, YC, 1016, HH2), FRAME('Stand de salon', 72, YC + HH2 + GAP, 496, HH2), FRAME('Chambre d\'hôtes', 592, YC + HH2 + GAP, 496, HH2)],
     'La lampe dans les lieux où Camille, Laurent et Sophie la rencontrent.', 'À compléter : l\'objet dans son contexte.'));
 
   // 15 · Final Image : conclusion & sources
@@ -864,7 +870,7 @@ const LAYOUTS = [
     FRAME('Glisse une photo ici', 0, 0, 1680, 1188, { lock: true }), R(0, 0, 1680, 1188, '#000000', { o: 0.35, lock: true }),
     TITLE('Grand', 'titre', 72, 760, 1200, 'h1')] },
   { key: 'deux-images', name: 'Deux images', build: () => [
-    ...HEAD('Surtitre', 'Titre de', 'la page'), FRAME('Photo 1', 72, YC, 756, 680), FRAME('Photo 2', 852, YC, 756, 680),
+    ...HEAD('Surtitre', 'Titre de', 'la page'), FRAME('Photo 1', 72, YC, 756, HC - 44), FRAME('Photo 2', 852, YC, 756, HC - 44),
     atBottom(T('Légende de la photo 1', 72, 0, 756, 'caption')), atBottom(T('Légende de la photo 2', 852, 0, 756, 'caption'))] },
   { key: 'quatre', name: 'Quatre colonnes', build: () => [
     ...HEAD('Surtitre', 'Titre de', 'la page'), T('Chapeau : ce que montrent les quatre colonnes.', 852, 142, 756, 'lead', { fs: 28 }),
@@ -879,7 +885,7 @@ const LAYOUTS = [
     KEEPB('Ce que disent ces chiffres.', 72, 1536)] },
   { key: 'intercalaire', name: 'Ouverture de partie', build: () => [
     FRAME('Photo de la partie', 900, 0, 780, 1188, { lock: true }), T('00', 72, 92, 400, 'num', { fs: 150, col: C.handle }),
-    TITLE('Titre', 'de la partie', 72, 668, 756, 'h1'), T(PILLS(['Sous-partie', 'Sous-partie', 'Sous-partie']), 72, 990, 756, 'body', { fs: 15.5 })] },
+    TITLE('Titre', 'de la partie', 72, 626, 820, 'h1'), T(PILLS(['Sous-partie', 'Sous-partie', 'Sous-partie']), 72, 990, 756, 'body', { fs: 15.5 })] },
   { key: 'moodboard', name: 'Moodboard', build: () => [
     FRAME('Image', 72, 72, 620, 494), FRAME('Image', 716, 72, 400, 494), FRAME('Image', 1140, 72, 468, 700), FRAME('Image', 72, 590, 300, 526),
     FRAME('Image', 396, 590, 720, 526), FRAME('Image', 1140, 796, 468, 320)] },
@@ -891,9 +897,9 @@ const LAYOUTS = [
     ...boxRow([0, 1, 2, 3, 4].map(i => { const x = 72 + i * 312; return { box: BOX(x, YC, 288, 100), extra: [FRAME('Photo', x + 12, YC + 12, 264, 300, { rad: 18 })],
       text: T(K('Étape ' + String(i + 1).padStart(2, '0')) + TT('Étape') + '<p class="s">Description courte.</p>', x + 26, YC + 336, 236, 'body', { fs: 15.5 }) }; }), 28)] },
   { key: 'galerie', name: 'Recherches (6 cadres)', build: () => [
-    ...HEAD('Recherches', 'Titre', null, { w: 1016, t: { fs: 60 } }),
-    ...[0, 1, 2, 3, 4, 5].map(i => FRAME('Croquis ' + (i + 1), X3[i % 3], i < 3 ? YC : YC + 382, W3, 358))] },
+    ...HEAD('Recherches', 'Titre', null, { w: 1016, t: { fs: 84 } }),
+    ...[0, 1, 2, 3, 4, 5].map(i => FRAME('Croquis ' + (i + 1), X3[i % 3], i < 3 ? YC : YC + HH2 + GAP, W3, HH2))] },
   { key: 'mockup', name: 'Mise en situation', build: () => [
-    FRAME('Mockup', 72, Y0, 1016, 980), T('Surtitre', 1112, Y0, 496, 'eyebrow'), TITLE('Titre de', 'la page', 1112, YT, 496, 'h2', { fs: 56 }),
+    FRAME('Mockup', 72, Y0, 1016, 980), T('Surtitre', 1112, Y0, 496, 'eyebrow'), TITLE('Titre de', 'la page', 1112, YT, 496, 'h2', { fs: 76 }),
     T(K('Intertitre', 'g') + '<p>Ce que montre la mise en situation.</p>', 1112, YC, 496, 'body', { fs: 19 }), KEEPB('Une phrase.', 1112, 496)] }
 ];

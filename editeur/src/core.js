@@ -149,8 +149,8 @@ function famKeyFromCss(ff) {
    Tailles en px de page (4 px = 1 mm ; 1 px ≈ 0,71 pt). */
 const STYLES = {
   cover:   { label: 'Titre de couverture', ff: 'serif', fs: 176, lh: 0.95, ls: 0.02, fw: 400, up: true },
-  h1:      { label: 'Titre de section', ff: 'serif', fs: 124, lh: 0.98, ls: -0.01, fw: 400 },
-  h2:      { label: 'Titre de page', ff: 'serif', fs: 76, lh: 1.04, ls: -0.005, fw: 400 },
+  h1:      { label: 'Titre de section', ff: 'serif', fs: 140, lh: 0.98, ls: -0.01, fw: 400 },
+  h2:      { label: 'Titre de page', ff: 'serif', fs: 112, lh: 1.0, ls: -0.01, fw: 400 },
   h3:      { label: 'Intertitre', ff: 'serif', fs: 26, lh: 1.25, ls: 0, fw: 400 },
   lead:    { label: 'Chapeau', ff: 'serif', fs: 30, lh: 1.3, ls: 0, fw: 400 },
   body:    { label: 'Texte courant', ff: 'serif', fs: 18, lh: 1.5, ls: 0, fw: 400 },

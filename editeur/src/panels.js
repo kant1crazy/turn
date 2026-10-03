@@ -535,7 +535,7 @@ function checkTemplateUpdate(manual) {
   const list = plan.changed.slice(0, 6).map(p => p.name).join(', ') + (m > 6 ? '…' : '');
   openModal(h('div', { class: 'confirm' },
     h('h2', null, 'Nouvelle mise en page'),
-    h('p', null, `Minion partout, plus aucun filet, plus d’air : ${n} page${n > 1 ? 's' : ''} du modèle ${n > 1 ? 'passent' : 'passe'} au nouveau style. Ctrl+Z annule la mise à jour.`),
+    h('p', null, `${TPL_NOTE} : ${n} page${n > 1 ? 's' : ''} du modèle ${n > 1 ? 'passent' : 'passe'} au nouveau style. Ctrl+Z annule la mise à jour.`),
     m ? h('label', { class: 'tplall', for: 'tpl-all' }, box, h('span', null, `Remplacer aussi ${m > 1 ? 'les ' + m + ' pages que tu as modifiées' : 'la page que tu as modifiée'} (${list}). Tes changements sur ${m > 1 ? 'ces pages' : 'cette page'} seront perdus.`)) : null,
     h('div', { class: 'mbtns' },
       btn('Plus tard', () => { closeModal(); toast('Tu pourras le faire depuis le menu ⋯'); }, 'ghost'),
