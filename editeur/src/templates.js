@@ -4,8 +4,12 @@
    fins en bleu, flèches ↗ ↘ en tête des points, « À retenir » sous un court
    trait bleu. Texte courant en Minion. Positions en px de page (1680 × 1188).
    ========================================================================== */
-const TPL_VERSION = 5;
-const TPL_NOTE = 'Nouvelle direction artistique : grandes capitales, pages bleues et noires, photos en noir et blanc';
+const TPL_VERSION = 6;
+const TPL_NOTE = 'Nouvelle direction artistique (grandes capitales, pages bleues et noires) et axes de recherche étoffés';
+/* Pages apparues dans une version du modèle : ajoutées aux dossiers plus anciens
+   lors de la mise à jour. Pages retirées : supprimées seulement si elles n'ont pas été modifiées. */
+const TPL_NEW = { 6: ['Axe 1 · Références', 'Axe 2 · Références', 'Axe 3 · Références', 'Axe 3 · Recherches', 'Axe 3 · Bilan'] };
+const TPL_RETIRED = ['Axe 3 · Recherches & bilan'];
 const IMG = {
   pile: { src: 'img/pile.jpg', nw: 1977, nh: 876 },
   mains: { src: 'img/mains.jpg', nw: 1645, nh: 2400 },
@@ -209,43 +213,65 @@ function persona(d) {
   ];
   return PAGE('c5', '7 · B Story', 'Persona · ' + d.name, els, { notes: 'Persona : ajoute un portrait libre de droits (noir et blanc dans l\'inspecteur). Un persona ne garde qu\'une option par champ.' });
 }
-function axePages(n, name, a, b, mb, intent, kw, marche, manque, keep, beat, two) {
+/* Recadrage d'une image sur une zone (en px de l'image d'origine), pour citer
+   une référence précise d'un moodboard. */
+function CROP(img, x, y, w, hh, [rx, ry, rw, rh], o = {}) {
+  const base = IMG[img], nw = base.nw, nh = base.nh;
+  const cover = Math.max(w / nw, hh / nh), s = Math.max(w / rw, hh / rh);
+  const bw = nw * s, bh = nh * s, cxi = rx + rw / 2, cyi = ry + rh / 2;
+  const fx = bw - w > 0.5 ? clamp((w / 2 - cxi * s) / (w - bw), 0, 1) : 0.5;
+  const fy = bh - hh > 0.5 ? clamp((hh / 2 - cyi * s) / (hh - bh), 0, 1) : 0.5;
+  return I(img, x, y, w, hh, { zoom: round(s / cover, 4), fx: round(fx, 4), fy: round(fy, 4), ...o });
+}
+const CRIT = ['Lien à la matière', 'Lien à la lumière (le produit)', 'Singularité', 'Facilité de déclinaison'];
+
+/* Un axe de recherche en quatre pages : intention, références, recherches, bilan. */
+function axePages(A) {
+  const { n, name, a, b, mb, beat } = A;
   const pages = [];
+  const sub = label => T(`<span class="hl">Axe ${n}</span> · ${label}`, ML, 234, 760, 'h3', { fs: 22, fw: 400 });
   pages.push(PAGE('c6', beat, `Axe ${n} · Intention`, [
     I(mb, 900, 0, 780, 1188, { lock: true, anim: { type: 'reveal' } }),
     TTL([a, `<mark class="sel">${b}</mark>`], ML, YT, 780, { fs: 112 }),
-    LEAD(intent, ML, YC, 720, { fs: 34 }),
-    T(N2(n - 1), 60, 640, 500, 'num', { fs: 220 }),
-    atBottom(T(PILLS(kw.split(' · ')), ML, 0, 760, 'body', { ff: 'sans', fs: 16 }), YB, BLACK)
+    LEAD(A.intent, ML, YC, 720, { fs: 32, lh: 1.18 }),
+    T(`<p><b>${A.question}</b></p><p>${A.parti}</p>`, ML, 570, 700, 'body', { fs: 18 }),
+    T(N2(n - 1), 60, 800, 500, 'num', { fs: 160 }),
+    atBottom(T(PILLS(A.kw.split(' · ')), ML, 0, 760, 'body', { ff: 'sans', fs: 16 }), YB, BLACK)
   ], { bg: BLACK, notes: 'Remplace le moodboard par l\'image la plus forte de l\'axe.' }));
-  const right = (x, top, w = 496) => {
-    const c1 = ITEM('Ce qui marche', marche, x, top, w, { ar: '↗' });
-    const c2 = ITEM('Ce qui manque', manque, x, below(c1, 40), w, { ar: '↘' });
-    return [c1, c2, KEEPB(keep, x, w)];
+  pages.push(PAGE('c6', beat, `Axe ${n} · Références`, [
+    TTL([name]), sub('Références'),
+    T(A.refIntro, 852, 236, 756, 'body', { fs: 17, tone: 'sub' }),
+    ...A.refs.flatMap(([box, t, d], j) => [CROP(mb, X4[j], 316, W4, 440, box),
+      T(K('Référence ' + N2(j)) + TT(t) + `<p>${d}</p>`, X4[j], 780, W4 - 6, 'body', { fs: 16 })]),
+    KEEPB(A.refKeep, ML, 936)
+  ], { notes: `Références tirées du moodboard ${n} (recadrées dans l'image du moodboard : double-clique pour ajuster le cadrage, ou remplace par l'image d'origine en meilleure définition).` }));
+  const FY = 316, FH = 250, R2 = FY + FH + 124;
+  const fr = (j, x, y, w) => {
+    const [label, desc] = A.frames[j];
+    return [FRAME(label, x, y, w, FH), T(K(label) + `<p>${desc}</p>`, x, y + FH + 14, w, 'body', { fs: 15 })];
   };
-  const sub = (label, x = ML) => T(`<span class="hl">Axe ${n}</span> · ${label}`, x, 234, 760, 'h3', { fs: 22, fw: 400 });
-  const FY = 316, FH = 362;
-  if (two) {
-    pages.push(PAGE('c6', beat, `Axe ${n} · Recherches & bilan`, [
-      TTL([name]), sub('Recherches & bilan'),
-      FRAME('Croquis de logo', 72, FY, 496, FH), FRAME('Essais typographiques', 592, FY, 496, FH),
-      FRAME('Motifs & textures', 72, FY + FH + GAP, 496, FH), FRAME('Mise en situation', 592, FY + FH + GAP, 496, FH),
-      ...right(1112, FY)
-    ]));
-    return pages;
-  }
   pages.push(PAGE('c6', beat, `Axe ${n} · Recherches`, [
     TTL([name]), sub('Recherches'),
-    T('Notes de recherche : à compléter.', 852, 240, 756, 'body', { tone: 'sub' }),
-    FRAME('Croquis de logo', X3[0], FY, W3, FH), FRAME('Essais typographiques', X3[1], FY, W3, FH), FRAME('Motifs & textures', X3[2], FY, W3, FH),
-    FRAME('Palette & essais couleur', 72, FY + FH + GAP, 496, FH), FRAME('Déclinaison test', 592, FY + FH + GAP, 1016, FH)
-  ]));
+    T(`<b>Démarche.</b> ${A.method}`, 852, 236, 756, 'body', { fs: 17 }),
+    ...fr(0, X3[0], FY, W3), ...fr(1, X3[1], FY, W3), ...fr(2, X3[2], FY, W3),
+    ...fr(3, 72, R2, 496), ...fr(4, 592, R2, 1016)
+  ], { notes: 'Les légendes sous les cadres sont des pistes : remplacez-les par ce que vous avez réellement testé.' }));
+  const crit = CRIT.flatMap((c, j) => {
+    const y = 344 + j * 52;
+    return [T(c, 1112, y, 380, 'body', { ff: 'sans', fs: 15, anim: { type: 'none' } }),
+      T(`${A.scores[j]}/5`, 1508, y, 100, 'body', { ff: 'sans', fs: 15, al: 'right', tone: 'sub', anim: { type: 'none' } }),
+      R(1112, y + 28, 496, 5, '#E2E2E2'), R(1112, y + 28, Math.round(496 * A.scores[j] / 5), 5, BLUE)];
+  });
+  const c1 = ITEM('Ce qui marche', A.marche, 1112, 580, 496, { ar: '↗' });
   pages.push(PAGE('c6', beat, `Axe ${n} · Bilan`, [
     FRAME('Mise en situation : étiquette, post Instagram, packaging…', 72, YT, 1016, YB - YT),
     T(`<span class="hl">Axe ${n}</span> · Bilan`, 1112, YT, 496, 'h3', { fs: 22, fw: 400 }),
     TTL([a, b], 1112, 140, 496, { fs: 64 }),
-    ...right(1112, YC)
-  ]));
+    T(K('Évaluation'), 1112, 306, 496, 'body'),
+    ...crit,
+    c1, ITEM('Ce qui manque', A.manque, 1112, below(c1, 36), 496, { ar: '↘' }),
+    KEEPB(A.keep, 1112, 496)
+  ], { notes: 'Évaluation sur 5 : une proposition à discuter. Modifie les notes et la longueur des barres.' }));
   return pages;
 }
 
@@ -751,24 +777,77 @@ function buildDossier() {
       })
     ]));
   }
-  P.push(...axePages(1, 'Géométrie vivante', 'Géométrie', 'vivante', 'mb1', axes[0][3], axes[0][4],
-    'Une base solide : la piste parle directement de la matière (nœuds, strates).',
-    'Elle ne dit rien de la lumière, donc du produit ; les courbes de niveau sont un code très répandu.',
-    'Une base solide mais incomplète : il faut relier la matière à la lumière.', '9 · Midpoint'));
-  P.push(...axePages(2, 'La main à l\'œuvre', 'La main', 'à l\'œuvre', 'mb2', axes[1][3], axes[1][4],
-    'Authentique : le geste, l\'outil, l\'empreinte rendent la fabrication visible.',
-    'Les codes de l\'artisanat (mains, atelier, kraft) sont partagés par toutes les marques artisanales : faible différenciation.',
-    'Authentique mais trop générique : il faut un signe propre au sarment.', '10 · Bad Guys Close In'));
-  P.push(...axePages(3, 'Ombre & lumière', 'Ombre', '& lumière', 'mb3', axes[2][3], axes[2][4],
-    'Le plus proche du produit : une lampe révèle le sarment par son ombre.',
-    'Des références trop géométriques pour une matière organique : à tester avec de vraies ombres de sarments.',
-    'La bonne direction : la lumière révèle la matière.', '11 · All Is Lost', true));
+  const AXES = [
+    { n: 1, name: 'Géométrie vivante', a: 'Géométrie', b: 'vivante', mb: 'mb1', beat: '9 · Midpoint', intent: axes[0][3], kw: axes[0][4],
+      question: 'Comment dessiner une matière qui n\'est jamais deux fois la même ?',
+      parti: 'Le sarment n\'est jamais droit : il pousse en zigzag d\'un nœud à l\'autre et s\'enroule en vrilles. Plutôt que de corriger ces irrégularités, l\'axe les relève et les dessine, comme un géographe relève un relief. La matière devient un système graphique : lignes de croissance, cernes, strates.',
+      refIntro: 'Quatre images du moodboard 1, et ce que chacune apporte au projet.',
+      refs: [[[255, 490, 345, 525], 'La vrille', 'Le seul signe qui ne peut venir que de la vigne : une spirale vivante, à la fois ligne et volume. Piste de logo : la vrille dessinée d\'un seul trait.'],
+        [[580, 90, 355, 440], 'Les courbes de niveau', 'La carte transforme un relief en lignes. Appliquée au projet : relever le relief de chaque domaine pour un motif propre à chaque parcelle.'],
+        [[1008, 580, 270, 375], 'SAGE GLOW', 'Une serif aux formes végétales : les lettres poussent comme des tiges. Une piste typographique pour le nom.'],
+        [[605, 548, 250, 250], 'Les cernes', 'La coupe du bois raconte son âge. Un sarment n\'a qu\'un an : ses cernes sont fins, presque une empreinte digitale.']],
+      refKeep: 'Les références les plus justes viennent de la vigne elle-même : la vrille plutôt que la carte.',
+      method: 'relever un vrai sarment (photo à plat, calque), vectoriser ses courbes, puis simplifier jusqu\'au signe.',
+      frames: [['Croquis de logo', 'Un S d\'un seul trait qui suit une vrille ; le nom posé sur une ligne de croissance.'],
+        ['Essais typographiques', 'Une serif organique (type SAGE GLOW) pour le nom, une linéale fine pour les textes.'],
+        ['Motifs & textures', 'Les nœuds du sarment relevés au calque, puis répétés en courbes de niveau.'],
+        ['Palette & essais couleur', 'Vert forêt, brun sarment, sauge, et l\'orange de la vrille en accent.'],
+        ['Déclinaison test', 'Une étiquette avec les courbes du relief du domaine d\'origine et ses coordonnées GPS, comme une carte.']],
+      scores: [5, 1, 3, 4],
+      marche: 'Une base solide : la piste parle directement de la matière (nœuds, strates, vrilles).',
+      manque: 'Elle ne dit rien de la lumière, donc du produit ; les courbes de niveau sont un code très répandu.',
+      keep: 'Une base solide mais incomplète : il faut relier la matière à la lumière.' },
+    { n: 2, name: 'La main à l\'œuvre', a: 'La main', b: 'à l\'œuvre', mb: 'mb2', beat: '10 · Bad Guys Close In', intent: axes[1][3], kw: axes[1][4],
+      question: 'Comment montrer le geste plutôt que l\'objet fini ?',
+      parti: 'L\'axe met en avant le travail : la main qui récolte, l\'outil qui entaille, l\'assemblage qui tient sans colle. Chaque objet garde la trace du geste qui l\'a fait : une empreinte, une encoche, une imperfection assumée. Le sarment devient la preuve d\'un savoir-faire.',
+      refIntro: 'Quatre images du moodboard 2, et ce que chacune apporte au projet.',
+      refs: [[[1110, 200, 200, 255], 'L\'empreinte', 'Des cernes imprimés comme un tampon : la matière devient un signe qu\'on peut apposer sur une étiquette, un carton, un mur.'],
+        [[1500, 130, 400, 510], 'La main du vigneron', 'Le geste de la taille, au début de toute la chaîne. Une image à refaire vous-mêmes, pendant la taille.'],
+        [[453, 745, 332, 465], 'Angle Violin', 'Une serif contrastée, avec des ligatures : le dessin de la lettre montre la main du calligraphe.'],
+        [[1505, 660, 315, 580], 'L\'assemblage', 'Des pièces qui s\'emboîtent sans colle ni vis : un principe pour le pied de lampe comme pour le packaging.']],
+      refKeep: 'Le geste est juste, mais ses images (mains, atelier, kraft) appartiennent à toutes les marques artisanales.',
+      method: 'faire les empreintes à la main (sarments encrés, tampons gravés), les scanner et garder les accidents.',
+      frames: [['Croquis de logo', 'Un tampon : le nom gravé dans le bois et imprimé à l\'encre, avec ses manques.'],
+        ['Essais typographiques', 'Une serif contrastée (Angle Violin, Die Jelk) face à une linéale d\'atelier.'],
+        ['Motifs & textures', 'Empreintes de vrais sarments encrés, papier kraft, coutures et entailles.'],
+        ['Palette & essais couleur', 'Crème, kraft, bois clair, noyer, olive et encre.'],
+        ['Déclinaison test', 'Un carton kraft tamponné à la main, fermé par une encoche, avec l\'étiquette du domaine.']],
+      scores: [3, 1, 2, 5],
+      marche: 'Authentique : le geste, l\'outil et l\'empreinte rendent la fabrication visible.',
+      manque: 'Les codes de l\'artisanat (mains, atelier, kraft) sont partagés par toutes les marques artisanales : faible différenciation.',
+      keep: 'Authentique mais trop générique : il faut un signe propre au sarment.' },
+    { n: 3, name: 'Ombre & lumière', a: 'Ombre', b: '& lumière', mb: 'mb3', beat: '11 · All Is Lost', intent: axes[2][3], kw: axes[2][4],
+      question: 'Et si l\'identité montrait ce que la lampe fait à la pièce ?',
+      parti: 'Une lampe ne montre pas seulement son pied : allumée, elle projette son ombre sur le mur. L\'axe part de ce moment, quand le sarment se dessine en grand autour de lui. L\'identité ne montre plus l\'objet, mais la lumière qui le révèle.',
+      refIntro: 'Quatre images du moodboard 3, et ce que chacune apporte au projet.',
+      refs: [[[1150, 880, 280, 430], 'Try to save', 'Un amas de bâtons dont l\'ombre écrit des mots : exactement ce qu\'un fagot de sarments pourrait faire. Piste de logo : un nom qui n\'existe que dans l\'ombre.'],
+        [[1700, 400, 250, 380], 'La sphère de fil', 'Une lampe faite de lignes croisées qui couvre la pièce d\'ombres : très proche d\'un abat-jour en sarments.'],
+        [[1648, 940, 240, 360], 'Even in the shadow', 'Une typographie dessinée par la lumière et l\'ombre : un ton possible pour les affiches et les réseaux.'],
+        [[640, 140, 345, 610], 'Le moucharabieh', 'La lumière filtrée devient motif. À traduire avec des formes organiques plutôt que géométriques.']],
+      refKeep: 'La référence la plus forte est « Try to save » : un tas de bâtons qui écrit avec son ombre.',
+      method: 'un studio de fortune (une lampe, un mur blanc, des sarments), puis une sélection des ombres les plus lisibles.',
+      frames: [['Croquis de logo', 'Le nom écrit par l\'ombre d\'un fagot éclairé de côté : photo, puis vectorisation.'],
+        ['Essais typographiques', 'Une linéale en capitales, nette comme une ombre portée, et sa version floue.'],
+        ['Motifs & textures', 'Les ombres de vrais sarments à la lampe torche, à différentes distances du mur.'],
+        ['Palette & essais couleur', 'Noir, ombre, bois, ambre, pierre, lumière : la palette d\'une pièce au crépuscule.'],
+        ['Mise en situation', 'La lampe allumée dans une chambre d\'hôtes, son ombre au mur, le logo projeté à côté.']],
+      scores: [3, 5, 4, 3],
+      marche: 'Le plus proche du produit : une lampe révèle le sarment par son ombre.',
+      manque: 'Des références trop géométriques pour une matière organique : à tester avec de vraies ombres de sarments.',
+      keep: 'La bonne direction : la lumière révèle la matière.' }];
+  for (const A of AXES) P.push(...axePages(A));
   P.push(PAGE('c6', '12 · Dark Night of the Soul', 'Axe final', [
-    FRAME('Logo final', 72, YT, 1016, YB - YT),
-    T('Axe final', 1112, YT, 496, 'eyebrow'),
-    TTL(['La ligne', 'du sarment,', '<mark class="sel">révélée</mark>', '<mark class="sel">par la lumière</mark>'], 1112, 140, 496, { fs: 60 }),
-    T('La ligne vivante du sarment (axe 1) révélée par la lumière (axe 3), avec la trace de la main (axe 2) dans les textures et l\'étiquette. Proposition à valider.', 1112, 500, 496, 'body'),
-    KEEPB('La réponse graphique à la problématique, en une image.', 1112, 496, { pageBg: BLUE })
+    FRAME('Logo final', 72, YT, 756, YB - YT),
+    TTL(['La ligne', 'du sarment,', '<mark class="sel">révélée par</mark>', '<mark class="sel">la lumière</mark>'], 852, YT, 756, { fs: 76 }),
+    T('La ligne vivante du sarment (axe 1), révélée par la lumière (axe 3), avec la trace de la main (axe 2) dans les textures et l\'étiquette. Proposition à valider.', 852, 430, 700, 'body', { fs: 18 }),
+    ...(() => {
+      const it = [['De l\'axe 1', 'La ligne', 'Le tracé du sarment, nœuds et vrilles compris, devient le dessin du logo.'],
+        ['De l\'axe 2', 'L\'empreinte', 'La trace de la main reste dans les textures, le tampon et l\'étiquette de traçabilité.'],
+        ['De l\'axe 3', 'L\'ombre portée', 'La lumière révèle la ligne : en photo, en affiche, et au mur quand la lampe est allumée.']];
+      let y = 570;
+      return it.map(([k, t, d]) => { const e = ITEM(t, d, 852, y, 700, { k }); y = below(e, 30); return e; });
+    })(),
+    KEEPB('La réponse graphique à la problématique, en une image.', 852, 700, { pageBg: BLUE })
   ], { bg: BLUE, notes: 'Ce n\'est qu\'une proposition de synthèse : c\'est à vous de décider quel axe l\'emporte.' }));
 
   // 13 · Break into Three : charte

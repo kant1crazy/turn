@@ -436,6 +436,7 @@ function drawInlineBoxes(ctx, root) {
   const pdf = ctx.pdf, pr = ctx.pr;
   for (const n of root.querySelectorAll('mark, span')) {
     const cs = getComputedStyle(n);
+    if (n.tagName === 'MARK' && n.classList.contains('sel')) { drawSelMark(ctx, n, cs); continue; }
     const bg = cssColorToRgba(cs.backgroundColor);
     if (!bg || bg[3] === 0) continue;
     const rects = [...n.getClientRects()].filter(r => r.width > 0.5);
@@ -446,13 +447,23 @@ function drawInlineBoxes(ctx, root) {
       const x = r.left - pr.left, y = r.top - pr.top;
       fillRound(pdf, x, y, r.width, r.height, rad);
     }
-    if (n.tagName === 'MARK' && n.classList.contains('sel')) {
-      const fs = parseFloat(cs.fontSize) || 18;
-      const hd = Math.max(9, 0.145 * fs), hb = Math.max(2, 0.026 * fs);
-      const a = rects[0], b = rects[rects.length - 1];
-      drawHandles(pdf, a.left - pr.left, a.top - pr.top, a.height, b.right - pr.left, b.top - pr.top, b.bottom - pr.top, hd, hb, handleColor(n));
-    }
   }
+}
+/* Texte surligné : la boîte du mot déborde d'une demi-poignée de chaque côté
+   (voir page.css) ; le surlignage et les poignées sont posés à l'intérieur. */
+function drawSelMark(ctx, n, cs) {
+  const pdf = ctx.pdf, pr = ctx.pr;
+  const rects = [...n.getClientRects()].filter(r => r.width > 0.5);
+  if (!rects.length) return;
+  const fs = parseFloat(cs.fontSize) || 18;
+  const hd = Math.max(9, 0.145 * fs), hb = Math.max(2, 0.026 * fs), e = hd / 2;
+  setFill(pdf, cssColorToRgba(cs.getPropertyValue('--doc-sel').trim()) || hexToRgb(C.sel));
+  rects.forEach((r, i) => {
+    const x0 = r.left + (i === 0 ? e : 0), x1 = r.right - (i === rects.length - 1 ? e : 0);
+    if (x1 - x0 > 0.3) pdf.rect(MM(x0 - pr.left), MM(r.top + e - pr.top), MM(x1 - x0), MM(r.height - 2 * e), 'F');
+  });
+  const a = rects[0], b = rects[rects.length - 1];
+  drawHandles(pdf, a.left + e - pr.left, a.top + e - pr.top, a.height - 2 * e, b.right - e - pr.left, b.top + e - pr.top, b.bottom - e - pr.top, hd, hb, handleColor(n));
 }
 function chooseFam(famKey, bold, ital, cp) {
   const order = [famKey, 'sans', 'serif'].filter((k, i, a) => FAM[k] && a.indexOf(k) === i);

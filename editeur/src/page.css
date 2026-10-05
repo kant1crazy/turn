@@ -54,29 +54,41 @@
 .pg .tx i, .pg .tx em { font-style: italic; }
 .pg .tx [contenteditable] { outline: none; }
 
-/* Sélection « texte surligné » : la signature du dossier */
+/* Sélection « texte surligné » : la signature du dossier.
+   Tout est dessiné en fonds superposés sur la boîte du mot (découpée sur
+   plusieurs lignes) : la poignée de gauche s'accroche au début de la
+   sélection, celle de droite à sa fin, et elles ont toujours la hauteur
+   exacte du surlignage, quelle que soit la police. */
+@property --sw { syntax: '<number>'; inherits: true; initial-value: 1; }
+@property --hl { syntax: '<number>'; inherits: true; initial-value: 1; }
+@property --hr { syntax: '<number>'; inherits: true; initial-value: 1; }
 .pg mark.sel {
-  --hd: max(9px, .145em); --hb: max(2px, .026em);
-  position: relative; z-index: -1; background: var(--doc-sel); color: inherit; padding: 0 .1em;
-  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+  --hd: max(9px, .145em); --hb: max(2px, .026em); --e: calc(var(--hd) / 2); --hc: var(--doc-handle);
+  position: relative; z-index: -1; color: inherit;
+  padding: var(--e) calc(.1em + var(--e)); margin: 0 calc(-1 * var(--e));
+  -webkit-box-decoration-break: slice; box-decoration-break: slice;
+  background-color: transparent;
+  background-image:
+    radial-gradient(circle closest-side, var(--hc) 97%, transparent 100%),
+    linear-gradient(var(--hc), var(--hc)),
+    linear-gradient(var(--hc), var(--hc)),
+    radial-gradient(circle closest-side, var(--hc) 97%, transparent 100%),
+    linear-gradient(var(--doc-sel), var(--doc-sel));
+  background-repeat: no-repeat;
+  background-size:
+    calc(var(--hd) * var(--hl)) calc(var(--hd) * var(--hl)),
+    calc(var(--hb) * var(--hl)) calc((100% - var(--e)) * var(--hl)),
+    calc(var(--hb) * var(--hr)) calc((100% - var(--e)) * var(--hr)),
+    calc(var(--hd) * var(--hr)) calc(var(--hd) * var(--hr)),
+    calc((100% - 2 * var(--e)) * var(--sw)) calc(100% - 2 * var(--e));
+  background-position:
+    left calc(var(--e) - var(--hd) * var(--hl) / 2) top calc(var(--e) - var(--hd) * var(--hl) / 2),
+    left calc(var(--e) - var(--hb) / 2) top 0,
+    right calc(var(--e) - var(--hb) / 2) top var(--e),
+    right calc(var(--e) - var(--hd) * var(--hr) / 2) bottom calc(var(--e) - var(--hd) * var(--hr) / 2),
+    left var(--e) top var(--e);
 }
 .pg.is-dark mark.sel, .pg .on-dark mark.sel { color: #0E0E0E; }
-.pg mark.sel::before, .pg mark.sel::after {
-  content: ""; position: absolute; width: var(--hd); pointer-events: none;
-  height: calc(var(--doc-ch, 1.111em) + var(--hd) / 2);
-}
-.pg mark.sel::before {
-  left: calc(var(--hd) / -2); top: calc(var(--hd) / -2);
-  background:
-    radial-gradient(circle closest-side, var(--doc-handle) 97%, transparent 100%) 0 0 / var(--hd) var(--hd) no-repeat,
-    linear-gradient(var(--doc-handle), var(--doc-handle)) 50% 0 / var(--hb) 100% no-repeat;
-}
-.pg mark.sel::after {
-  right: calc(var(--hd) / -2); top: 0;
-  background:
-    radial-gradient(circle closest-side, var(--doc-handle) 97%, transparent 100%) 0 100% / var(--hd) var(--hd) no-repeat,
-    linear-gradient(var(--doc-handle), var(--doc-handle)) 50% 0 / var(--hb) 100% no-repeat;
-}
 .pg .el.box-sel { --hd: 11px; --hb: 2.5px; }
 .pg .el.box-sel::before, .pg .el.box-sel::after {
   content: ""; position: absolute; width: var(--hd); height: calc(100% + var(--hd) / 2); pointer-events: none;
@@ -147,25 +159,29 @@
 .pg.mode-present .a-zoom > .in { animation: aZoom 1.4s cubic-bezier(.2,.7,.1,1) both; animation-delay: calc(var(--d, 0ms) + 220ms); }
 .pg.mode-present .a-zoom { animation-name: aFade; }
 .pg.mode-present .a-select { animation: none; }
-.pg.mode-present .a-select mark.sel, .pg.mode-present .a-select.box-sel {
+.pg.mode-present .a-select mark.sel {
+  animation: selL .35s ease-out both, selSweep .85s cubic-bezier(.7,0,.2,1) both, selR .35s ease-out both;
+  animation-delay: calc(var(--d, 0ms) + 300ms), calc(var(--d, 0ms) + 380ms), calc(var(--d, 0ms) + 1150ms);
+}
+.pg.mode-present .a-select.box-sel {
   background-color: transparent !important;
   background-image: linear-gradient(var(--doc-sel), var(--doc-sel)); background-repeat: no-repeat; background-size: 0% 100%;
-  animation: selSweep .85s cubic-bezier(.7,0,.2,1) forwards; animation-delay: calc(var(--d, 0ms) + 380ms);
+  animation: boxSweep .85s cubic-bezier(.7,0,.2,1) forwards; animation-delay: calc(var(--d, 0ms) + 380ms);
 }
-.pg.mode-present .a-select mark.sel::before, .pg.mode-present .a-select mark.sel::after,
-.pg.mode-present .a-select.box-sel::before, .pg.mode-present .a-select.box-sel::after {
-  opacity: 0; animation: aPop .35s ease-out forwards;
-}
-.pg.mode-present .a-select mark.sel::before, .pg.mode-present .a-select.box-sel::before { animation-delay: calc(var(--d, 0ms) + 300ms); }
-.pg.mode-present .a-select mark.sel::after, .pg.mode-present .a-select.box-sel::after { animation-delay: calc(var(--d, 0ms) + 1150ms); }
+.pg.mode-present .a-select.box-sel::before, .pg.mode-present .a-select.box-sel::after { opacity: 0; animation: aPop .35s ease-out forwards; }
+.pg.mode-present .a-select.box-sel::before { animation-delay: calc(var(--d, 0ms) + 300ms); }
+.pg.mode-present .a-select.box-sel::after { animation-delay: calc(var(--d, 0ms) + 1150ms); }
 @keyframes aFade { from { opacity: 0; } }
 @keyframes aRise { from { transform: translateY(34px); } }
 @keyframes aReveal { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
 @keyframes aZoom { from { transform: scale(1.07); } }
-@keyframes selSweep { to { background-size: 100% 100%; } }
+@keyframes boxSweep { to { background-size: 100% 100%; } }
+@keyframes selSweep { from { --sw: 0; } to { --sw: 1; } }
+@keyframes selL { from { --hl: 0; } to { --hl: 1; } }
+@keyframes selR { from { --hr: 0; } to { --hr: 1; } }
 @keyframes aPop { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) {
   .pg.mode-present .anim, .pg.mode-present .anim > .in, .pg.mode-present .a-select mark.sel { animation: none !important; }
-  .pg.mode-present .a-select mark.sel, .pg.mode-present .a-select.box-sel { background-size: 100% 100% !important; }
-  .pg.mode-present .a-select mark.sel::before, .pg.mode-present .a-select mark.sel::after { opacity: 1; animation: none; }
+  .pg.mode-present .a-select.box-sel { background-size: 100% 100% !important; }
+  .pg.mode-present .a-select.box-sel::before, .pg.mode-present .a-select.box-sel::after { opacity: 1; animation: none; }
 }

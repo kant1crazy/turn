@@ -512,20 +512,32 @@ function isTemplatePage(p) {
 function templateUpdatePlan() {
   const fresh = buildDossier();
   const byName = new Map(fresh.pages.map(p => [p.name, p]));
-  const same = [], changed = [];
+  const have = new Set(S.meta.order.map(id => S.pages.get(id)).filter(Boolean).map(p => p.name));
+  const same = [], changed = [], retired = [], added = [];
   for (const id of S.meta.order) {
     const p = S.pages.get(id);
-    if (!p || !byName.has(p.name)) continue;
-    if (isTemplatePage(p)) same.push(p); else changed.push(p);
+    if (!p) continue;
+    if (byName.has(p.name)) (isTemplatePage(p) ? same : changed).push(p);
+    else if (TPL_RETIRED.includes(p.name) && isTemplatePage(p)) retired.push(p);
   }
-  return { same, changed, byName };
+  // pages apparues depuis la version du dossier : ajoutées après leur voisine du modèle
+  const since = S.meta.tpl || 1;
+  const fresher = new Set(Object.entries(TPL_NEW).filter(([v]) => +v > since).flatMap(([, names]) => names));
+  fresh.pages.forEach((p, i) => {
+    if (!fresher.has(p.name) || have.has(p.name)) return;
+    let j = i - 1;
+    while (j >= 0 && !have.has(fresh.pages[j].name) && !added.some(a => a.page === fresh.pages[j])) j--;
+    if (j < 0) return;
+    added.push({ page: p, after: fresh.pages[j].name });
+  });
+  return { same, changed, retired, added, byName };
 }
 function checkTemplateUpdate(manual) {
   if (!S.meta || !canEdit()) return;
   if (!manual && ((S.meta.tpl || 1) >= TPL_VERSION || S.tplAsked)) return;
   S.tplAsked = true;
   const plan = templateUpdatePlan();
-  if (!plan.same.length && !plan.changed.length) {
+  if (!plan.same.length && !plan.changed.length && !plan.added.length) {
     if (manual) toast('Aucune page du modèle dans ce dossier.');
     else if ((S.meta.tpl || 1) < TPL_VERSION) { S.meta.tpl = TPL_VERSION; markMeta(); }
     return;
@@ -535,7 +547,7 @@ function checkTemplateUpdate(manual) {
   const list = plan.changed.slice(0, 6).map(p => p.name).join(', ') + (m > 6 ? '…' : '');
   openModal(h('div', { class: 'confirm' },
     h('h2', null, 'Nouvelle mise en page'),
-    h('p', null, `${TPL_NOTE} : ${n} page${n > 1 ? 's' : ''} du modèle ${n > 1 ? 'passent' : 'passe'} au nouveau style. Ctrl+Z annule la mise à jour.`),
+    h('p', null, `${TPL_NOTE} : ${n} page${n > 1 ? 's' : ''} du modèle ${n > 1 ? 'passent' : 'passe'} au nouveau style${plan.added.length ? `, et ${plan.added.length} nouvelle${plan.added.length > 1 ? 's pages sont ajoutées' : ' page est ajoutée'}` : ''}. Ctrl+Z annule la mise à jour.`),
     m ? h('label', { class: 'tplall', for: 'tpl-all' }, box, h('span', null, `Remplacer aussi ${m > 1 ? 'les ' + m + ' pages que tu as modifiées' : 'la page que tu as modifiée'} (${list}). Tes changements sur ${m > 1 ? 'ces pages' : 'cette page'} seront perdus.`)) : null,
     h('div', { class: 'mbtns' },
       btn('Plus tard', () => { closeModal(); toast('Tu pourras le faire depuis le menu ⋯'); }, 'ghost'),
@@ -550,14 +562,29 @@ function applyTemplateUpdate(plan, all) {
       S.pages.set(p.id, np);
       markDirty(p.id);
     }
+    for (const p of plan.retired) {
+      S.meta.order = S.meta.order.filter(id => id !== p.id);
+      S.pages.delete(p.id);
+    }
+    for (const { page, after } of plan.added) {
+      const at = S.meta.order.findIndex(id => (S.pages.get(id) || {}).name === after);
+      if (at < 0) continue;
+      const np = clone(page);
+      S.pages.set(np.id, np);
+      S.meta.order.splice(at + 1, 0, np.id);
+      markDirty(np.id);
+    }
     S.meta.tpl = TPL_VERSION;
     markMeta();
   });
+  for (const p of plan.retired) deletePageNow(p.id);
   S.sel = [];
+  if (!S.pages.has(S.cur)) S.cur = S.meta.order[0];
   renderSidebar();
   renderStage();
   renderInspector();
-  toast(`${pages.length} page${pages.length > 1 ? 's' : ''} au nouveau style.`);
+  const k = plan.added.length;
+  toast(`${pages.length} page${pages.length > 1 ? 's' : ''} au nouveau style${k ? `, ${k} page${k > 1 ? 's' : ''} ajoutée${k > 1 ? 's' : ''}` : ''}.`);
 }
 function onRemoteMeta(meta) {
   if (SAVE.meta || SAVE.busy) return;
