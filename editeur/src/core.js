@@ -11,12 +11,17 @@ const cw = n => n * COLW + (n - 1) * GUT;              // largeur de n colonnes
 const PT_PER_PX = 0.25 * 72 / 25.4;                    // 1 px de page = 0,7087 pt
 
 const C = {
-  ink: '#1D1D1F', paper: '#FFFFFF', sel: '#BCDBEF', handle: '#0087F0', blue: '#0B6FC7', green: '#4D5D43',
-  brown: '#7A4B2A', kraft: '#C9A27E', warm: '#F4EFE6', sand: '#E7DCCB', muted: '#6E6E73', sub: '#6E6E73',
-  line: '#E1DFDA', hair: '#E1DFDA', card: '#F4F4F1', cardBlue: '#E8F1FB', cardGreen: '#EDF1E9', cardBrown: '#F5EEE7',
-  dark: '#121212', darkCard: '#1E1E20', darkHair: '#2F2F31', white: '#FFFFFF', grey: '#8C8780'
+  ink: '#0E0E0E', paper: '#FFFFFF', sel: '#C9D5F7', handle: '#1D45D8', blue: '#1D45D8', green: '#4D5D43',
+  brown: '#7A4B2A', kraft: '#C9A27E', warm: '#F4EFE6', sand: '#E7DCCB', muted: '#6B6B6B', sub: '#6B6B6B',
+  line: '#DADADA', hair: '#DADADA', card: '#F2F2F0', cardBlue: '#E4EAFB', cardGreen: '#EDF1E9', cardBrown: '#F5EEE7',
+  dark: '#0B0B0B', darkCard: '#1A1A1A', darkHair: '#2A2A2A', white: '#FFFFFF', grey: '#8C8C8C', warn: '#D9480F'
 };
-const SWATCHES = ['#1D1D1F', '#FFFFFF', '#F4F4F1', '#E8F1FB', '#BCDBEF', '#0087F0', '#4D5D43', '#EDF1E9', '#7A4B2A', '#F5EEE7', '#C9A27E', '#6E6E73', '#121212', '#1E1E20'];
+/* Fond bleu cobalt : traité comme un fond sombre, mais avec ses propres teintes secondaires. */
+function isBlue(hex) {
+  const [r, g, b] = hexToRgb(hex || '#ffffff');
+  return b > 150 && b > r + 70 && b > g + 50;
+}
+const SWATCHES = ['#0E0E0E', '#FFFFFF', '#1D45D8', '#C9D5F7', '#E4EAFB', '#F2F2F0', '#6B6B6B', '#4D5D43', '#7A4B2A', '#C9A27E', '#D9480F', '#0B0B0B'];
 
 const NB = ' ';
 function typo(s) {
@@ -81,13 +86,22 @@ const FAM = {
     files: { n4: FONTDATA['MinionPro-Regular'] ? 'MinionPro-Regular' : 'CrimsonPro-Regular', n6: 'CrimsonPro-SemiBold', i4: 'CrimsonPro-Italic', i6: 'CrimsonPro-SemiBoldItalic' }
   },
   sans: {
+    css: 'DocSans', pdf: 'DocSans', asc: 0.97, ascK: {}, chK: {},
+    files: { n4: 'InterTight-Regular', n6: 'InterTight-Bold' }
+  },
+  light: {
+    css: 'DocLight', pdf: 'DocLight', asc: 0.97, ascK: {}, chK: {},
+    files: { n4: 'InterTight-Light' }
+  },
+  ui: {
     css: 'Instrument Sans', pdf: 'InstrumentSans', asc: 0.97, ascK: {}, chK: {},
     files: { n4: 'InstrumentSans-Regular', n6: 'InstrumentSans-SemiBold' }
   }
 };
 const STACK = {
-  serif: "'DocSerif', 'Instrument Sans', Georgia, serif",
-  sans: "'Instrument Sans', 'DocSerif', system-ui, sans-serif"
+  serif: "'DocSerif', 'DocSans', Georgia, serif",
+  sans: "'DocSans', 'DocSerif', system-ui, sans-serif",
+  light: "'DocLight', 'DocSans', system-ui, sans-serif"
 };
 function b64ToBytes(b64) {
   const bin = atob(b64), out = new Uint8Array(bin.length);
@@ -142,27 +156,31 @@ function covers(file, cp) {
   return set.has(cp);
 }
 function famKeyFromCss(ff) {
-  return /instrument/i.test((ff || '').split(',')[0]) ? 'sans' : 'serif';
+  const f = (ff || '').split(',')[0];
+  if (/docsans/i.test(f)) return 'sans';
+  if (/doclight/i.test(f)) return 'light';
+  if (/instrument/i.test(f)) return 'ui';
+  return 'serif';
 }
 
 /* ---------------------------------------------------------------- styles typographiques
    Tailles en px de page (4 px = 1 mm ; 1 px ≈ 0,71 pt). */
 const STYLES = {
-  cover:   { label: 'Titre de couverture', ff: 'serif', fs: 176, lh: 0.95, ls: 0.02, fw: 400, up: true },
-  h1:      { label: 'Titre de section', ff: 'serif', fs: 140, lh: 0.98, ls: -0.01, fw: 400 },
-  h2:      { label: 'Titre de page', ff: 'serif', fs: 112, lh: 1.0, ls: -0.01, fw: 400 },
-  h3:      { label: 'Intertitre', ff: 'serif', fs: 26, lh: 1.25, ls: 0, fw: 400 },
-  lead:    { label: 'Chapeau', ff: 'serif', fs: 30, lh: 1.3, ls: 0, fw: 400 },
+  cover:   { label: 'Titre de couverture', ff: 'sans', fs: 236, lh: 0.86, ls: -0.04, fw: 600, up: true },
+  h1:      { label: 'Titre de section', ff: 'sans', fs: 176, lh: 0.86, ls: -0.035, fw: 600, up: true },
+  h2:      { label: 'Titre de page', ff: 'sans', fs: 128, lh: 0.88, ls: -0.03, fw: 600, up: true },
+  h3:      { label: 'Intertitre', ff: 'sans', fs: 26, lh: 1.15, ls: -0.01, fw: 600 },
+  lead:    { label: 'Accroche', ff: 'sans', fs: 46, lh: 1.1, ls: -0.015, fw: 400 },
   body:    { label: 'Texte courant', ff: 'serif', fs: 18, lh: 1.5, ls: 0, fw: 400 },
   small:   { label: 'Texte secondaire', ff: 'serif', fs: 15.5, lh: 1.45, ls: 0, fw: 400, tone: 'sub' },
-  eyebrow: { label: 'Surtitre', ff: 'serif', fs: 14, lh: 1.3, ls: 0.16, fw: 400, up: true, tone: 'blue' },
-  label:   { label: 'Étiquette', ff: 'serif', fs: 13.5, lh: 1.3, ls: 0.14, fw: 400, up: true, tone: 'sub' },
-  sanslab: { label: 'Étiquette foncée', ff: 'serif', fs: 13.5, lh: 1.3, ls: 0.14, fw: 400, up: true },
-  num:     { label: 'Chiffre clé', ff: 'serif', fs: 110, lh: 0.95, ls: -0.01, fw: 400 },
-  quote:   { label: 'Citation', ff: 'serif', fs: 44, lh: 1.2, ls: 0, fw: 400 },
-  card:    { label: 'Carte', ff: 'serif', fs: 17, lh: 1.5, ls: 0, fw: 400, box: 'fill', bg: '#F4F4F1', rad: 28, pad: [34, 36] },
-  keep:    { label: 'À retenir', ff: 'serif', fs: 23, lh: 1.32, ls: 0, fw: 400, box: 'fill', bg: '#E8F1FB', rad: 24, pad: [26, 32] },
-  caption: { label: 'Légende', ff: 'serif', fs: 13.5, lh: 1.4, ls: 0, fw: 400, tone: 'sub' }
+  eyebrow: { label: 'Surtitre', ff: 'sans', fs: 13, lh: 1.3, ls: 0.06, fw: 600, up: true, tone: 'blue' },
+  label:   { label: 'Étiquette', ff: 'sans', fs: 13, lh: 1.3, ls: 0.05, fw: 400, up: true, tone: 'sub' },
+  sanslab: { label: 'Étiquette foncée', ff: 'sans', fs: 13, lh: 1.3, ls: 0.05, fw: 600, up: true },
+  num:     { label: 'Chiffre clé', ff: 'light', fs: 150, lh: 0.9, ls: -0.035, fw: 400, tone: 'blue' },
+  quote:   { label: 'Citation', ff: 'sans', fs: 44, lh: 1.12, ls: -0.015, fw: 400 },
+  card:    { label: 'Bloc', ff: 'serif', fs: 17, lh: 1.5, ls: 0, fw: 400, box: 'fill', bg: '#F2F2F0', rad: 0, pad: [32, 34] },
+  keep:    { label: 'À retenir', ff: 'sans', fs: 24, lh: 1.25, ls: -0.01, fw: 400 },
+  caption: { label: 'Légende', ff: 'sans', fs: 12.5, lh: 1.4, ls: 0, fw: 400, tone: 'sub' }
 };
 const TEXT_KEYS = ['ff', 'fs', 'lh', 'ls', 'fw', 'it', 'up', 'col', 'al', 'box', 'bg', 'pad', 'rad', 'tone'];
 function textStyle(el) {

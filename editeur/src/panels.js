@@ -197,7 +197,7 @@ function textPanel(box, el) {
   box.append(sec('Texte',
     !el.toc ? h('div', { class: 'ibtns' }, btn('Modifier le texte', () => enterEdit(el.id, null, null, false), 'primary small', 'text')) : h('p', { class: 'hint' }, 'Sommaire automatique : il se met à jour avec les chapitres et les numéros de page.'),
     row('Style', selIn(el.st, styleOpts, v => setProp(e => { e.st = v; for (const k of TEXT_KEYS) delete e[k]; }), 'Style de texte')),
-    row('Police', segIn(s.ff, [['serif', 'Serif'], ['sans', 'Linéale']], v => setProp(e => { e.ff = v; }))),
+    row('Police', segIn(s.ff, [['serif', 'Minion'], ['sans', 'Grotesque'], ['light', 'Fine']], v => setProp(e => { e.ff = v; }))),
     h('div', { class: 'grid2' },
       row('Corps', numIn(s.fs * PT_PER_PX, v => setProp(e => { e.fs = Math.max(4, round(v / PT_PER_PX, 2)); }), { unit: 'pt', step: 0.5, aria: 'Taille en points' })),
       row('Interl.', numIn(s.lh, v => setProp(e => { e.lh = clamp(v, 0.7, 3); }), { step: 0.05, dec: 2, aria: 'Interlignage' })),

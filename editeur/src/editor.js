@@ -281,7 +281,7 @@ function insertEl(el, opts = {}) {
 function toolAction(k) {
   if (!canEdit() && k !== 'select') { toast('Lecture seule.', 'warn'); return; }
   const presets = {
-    title: () => T('<p>Titre</p><p class="ind"><mark class="sel">de la page</mark></p>', 0, 0, 760, 'h2', { anim: { type: 'select' } }),
+    title: () => T('<p>Titre</p><p><mark class="sel">de la page</mark></p>', 0, 0, 1000, 'h2', { anim: { type: 'select' } }),
     text: () => T('Double-clique pour écrire.', 0, 0, 626, 'body'),
     keep: () => KEEP('Une phrase qui résume la page.', 0, 0, 626),
     card: () => CARD('<p class="k">Surtitre</p><p class="t">Titre de la carte</p><p>Texte de la carte. Double-clique pour écrire.</p>', 0, 0, 496, 300),
@@ -295,8 +295,8 @@ function toolAction(k) {
     case 'image': pickFile('image/*', files => addFiles(files)); break;
     case 'video': pickFile('video/mp4,video/webm', files => addFiles(files)); break;
     case 'frame': setTool('select'); insertEl(FRAME('Glisse une photo ici', 0, 0, 600, 420), { edit: false }); break;
-    case 'rect': setTool('select'); insertEl(R(0, 0, 360, 240, C.card, { rad: 28 }), { edit: false }); break;
-    case 'ellipse': setTool('select'); insertEl(ELL(0, 0, 220, 220, C.green), { edit: false }); break;
+    case 'rect': setTool('select'); insertEl(R(0, 0, 360, 240, C.card), { edit: false }); break;
+    case 'ellipse': setTool('select'); insertEl(ELL(0, 0, 220, 220, C.blue), { edit: false }); break;
     case 'line': setTool('select'); insertEl(LINE(0, 0, 500, 1.5, C.hair), { edit: false }); break;
     case 'chart': setTool('select'); insertEl(DONUT(0, 0, 300, [{ v: 60, c: C.green, l: 'Part A' }, { v: 40, c: '#D9D3C7', l: 'Part B' }]), { edit: false }); break;
     case 'toc': setTool('select'); insertEl(T('', 0, 0, 756, 'lead', { toc: true, fs: 36, lh: 1.25 }), { edit: false }); break;
@@ -1022,7 +1022,7 @@ function exitCrop() {
 }
 
 /* ---------------------------------------------------------------- édition de texte */
-const ALLOWED = { P: ['li', 'ind', 'tight', 'k', 'g', 't', 'n', 's', 'row', 'first', 'end', 'acc', 'green', 'brown'], BR: [], B: [], STRONG: [], I: [], EM: [], MARK: ['sel'], SPAN: ['tag', 'up', 'down', 'mix', 'warn', 'pill', 's', 'acc', 'green', 'brown'] };
+const ALLOWED = { P: ['li', 'ind', 'tight', 'k', 'g', 't', 'n', 's', 'row', 'first', 'end', 'acc', 'green', 'brown', 'ar', 'kb'], BR: [], B: [], STRONG: [], I: [], EM: [], MARK: ['sel'], SPAN: ['tag', 'up', 'down', 'mix', 'warn', 'pill', 's', 'acc', 'green', 'brown', 'hl', 'kbar'] };
 function sanitizeHTML(html) {
   const box = document.createElement('div');
   box.innerHTML = html;

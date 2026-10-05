@@ -11,7 +11,7 @@ import base64, json, os
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, 'src')
 FONTS = ['CrimsonPro-Regular', 'CrimsonPro-SemiBold', 'CrimsonPro-Italic', 'CrimsonPro-SemiBoldItalic',
-         'InstrumentSans-Regular', 'InstrumentSans-SemiBold']
+         'InstrumentSans-Regular', 'InstrumentSans-SemiBold', 'InterTight-Light', 'InterTight-Regular', 'InterTight-Bold']
 JS = ['core.js', 'store.js', 'render.js', 'templates.js', 'editor.js', 'panels.js', 'present.js', 'export.js']
 
 
@@ -52,7 +52,7 @@ def bundle(private):
         f'const FONTCOV = {json.dumps(cov, separators=(",", ":"))};\n'
         + ''.join(f'const {k}SIG = {json.dumps(v, ensure_ascii=False, separators=(",", ":"))};\n' for k, v in sigs.items())
         + js +
-        '\nwindow.__ed = { S, SAVE, FAM, buildPDF, buildDossier, renderPage, goPage, startPresent, stopPresent, flushSave, createFromTemplate, sanitizeHTML, checkTemplateUpdate, pageSig };\n'
+        '\nwindow.__ed = { S, SAVE, FAM, buildPDF, buildDossier, renderPage, goPage, startPresent, stopPresent, flushSave, createFromTemplate, sanitizeHTML, checkTemplateUpdate, pageSig, LAYOUTS, PAGE };\n'
         'boot().catch(e => { console.error(e); const o = document.getElementById("onboard"); if (o) { o.hidden = false; o.textContent = "Erreur au démarrage : " + (e && e.message || e); } });\n'
         '})();\n'
     )

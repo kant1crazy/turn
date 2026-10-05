@@ -150,6 +150,7 @@ async function buildPDF(pids, opts, progress) {
     await nextFrame();
     ctx.pr = dom.getBoundingClientRect();
     const bg = (page.bg || '#FFFFFF').toUpperCase();
+    ctx.bg = bg;
     if (bg !== '#FFFFFF') { setFill(pdf, bg); pdf.rect(0, 0, 420, 297, 'F'); }
     for (const el of page.els) {
       const node = dom.querySelector(`.el[data-id="${el.id}"]`);
@@ -317,8 +318,10 @@ async function drawImage(ctx, el, x, y, w, hh) {
 }
 function drawPlaceholder(ctx, el, x, y, w, hh) {
   const pdf = ctx.pdf;
-  setFill(pdf, '#F1F1EE');
-  setStroke(pdf, '#D3D0C9');
+  // mêmes teintes qu'à l'écran : gris clair, gris foncé sur fond noir, bleu sur fond bleu
+  const tone = isBlue(ctx.bg) ? ['#2A51DC', '#6F8BEA', [220, 227, 251]] : isDark(ctx.bg) ? ['#1A1A1A', '#3A3A3A', [142, 142, 142]] : ['#EFEFED', '#D0D0CC', [138, 138, 134]];
+  setFill(pdf, tone[0]);
+  setStroke(pdf, tone[1]);
   pdf.setLineWidth(0.4);
   pdf.setLineDashPattern([2, 1.5], 0);
   const rr = el.rad ? Math.min(el.rad, w / 2, hh / 2) : 0;
@@ -328,7 +331,7 @@ function drawPlaceholder(ctx, el, x, y, w, hh) {
   if (el.ph) {
     pdf.setFont(FAM.sans.pdf, 'normal');
     pdf.setFontSize(9);
-    pdf.setTextColor(138, 131, 120);
+    pdf.setTextColor(...tone[2]);
     const lines = pdf.splitTextToSize(el.ph, Math.max(20, MM(w) - 10));
     pdf.text(lines, MM(x + w / 2), MM(y + hh / 2), { align: 'center', baseline: 'middle' });
   }
@@ -384,8 +387,12 @@ function drawPen(ctx, el, x, y, w, hh) {
 }
 
 /* ---------------------------------------------------------------- texte */
-function drawHandles(pdf, x0, y0, h0, x1, y1t, y1b, hd, hb) {
-  setFill(pdf, [0, 135, 240]);
+function handleColor(node) {
+  const v = node ? getComputedStyle(node).getPropertyValue('--doc-handle').trim() : '';
+  return cssColorToRgba(v) || hexToRgb(C.handle);
+}
+function drawHandles(pdf, x0, y0, h0, x1, y1t, y1b, hd, hb, col) {
+  setFill(pdf, col || hexToRgb(C.handle));
   pdf.rect(MM(x0 - hb / 2), MM(y0), MM(hb), MM(h0), 'F');
   pdf.circle(MM(x0), MM(y0), MM(hd / 2), 'F');
   pdf.rect(MM(x1 - hb / 2), MM(y1t), MM(hb), MM(y1b - y1t), 'F');
@@ -398,7 +405,7 @@ function drawText(ctx, el, node, x, y, w, hh) {
   if (s.box === 'sel' || s.box === 'fill') {
     const bg = cssColorToRgba(cs.backgroundColor);
     if (bg && bg[3] > 0) { setFill(pdf, bg); fillRound(pdf, x, y, w, hh, parseFloat(cs.borderTopLeftRadius) || 0); }
-    if (s.box === 'sel') drawHandles(pdf, x, y, hh, x + w, y, y + hh, 11, 2.5);
+    if (s.box === 'sel') drawHandles(pdf, x, y, hh, x + w, y, y + hh, 11, 2.5, handleColor(node));
   } else if (s.box === 'rule') {
     const bc = cssColorToRgba(cs.borderTopColor) || [20, 20, 20];
     setFill(pdf, bc);
@@ -443,12 +450,12 @@ function drawInlineBoxes(ctx, root) {
       const fs = parseFloat(cs.fontSize) || 18;
       const hd = Math.max(9, 0.145 * fs), hb = Math.max(2, 0.026 * fs);
       const a = rects[0], b = rects[rects.length - 1];
-      drawHandles(pdf, a.left - pr.left, a.top - pr.top, a.height, b.right - pr.left, b.top - pr.top, b.bottom - pr.top, hd, hb);
+      drawHandles(pdf, a.left - pr.left, a.top - pr.top, a.height, b.right - pr.left, b.top - pr.top, b.bottom - pr.top, hd, hb, handleColor(n));
     }
   }
 }
 function chooseFam(famKey, bold, ital, cp) {
-  const order = famKey === 'sans' ? ['sans', 'serif'] : ['serif', 'sans'];
+  const order = [famKey, 'sans', 'serif'].filter((k, i, a) => FAM[k] && a.indexOf(k) === i);
   for (const fk of order) {
     const F = FAM[fk];
     const ik = 'i' + (bold ? '6' : '4'), nk = 'n' + (bold ? '6' : '4');

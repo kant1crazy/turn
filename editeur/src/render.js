@@ -19,8 +19,8 @@ function imgLayout(el, w = el.w, hh = el.h) {
 function pageIndex(pid) { return S.meta ? S.meta.order.indexOf(pid) : 0; }
 
 function renderPage(page, mode = 'edit', index = pageIndex(page.id)) {
-  const dark = isDark(page.bg || '#FFFFFF');
-  const pg = h('div', { class: `pg mode-${mode}${dark ? ' is-dark' : ''}`, 'data-pid': page.id });
+  const dark = isDark(page.bg || '#FFFFFF'), blue = isBlue(page.bg || '#FFFFFF');
+  const pg = h('div', { class: `pg mode-${mode}${dark ? ' is-dark' : ''}${blue ? ' is-blue' : ''}`, 'data-pid': page.id });
   pg.style.background = page.bg || '#FFFFFF';
   for (const el of page.els) pg.append(renderEl(el, mode, page, index));
   pg.append(renderChrome(page, index, mode));
@@ -46,19 +46,19 @@ function renderChrome(page, index, mode) {
   if (index <= 0) return box;
   const dark = isDark(page.bg || '#FFFFFF');
   const b = chromeBounds(page);
-  const ink = dark ? '#F5F5F7' : C.ink, sub = dark ? '#A1A1A6' : C.sub;
+  const blue = isBlue(page.bg || '#FFFFFF');
+  const ink = dark ? '#FFFFFF' : C.ink, sub = blue ? '#C3CEF6' : dark ? '#9A9A9A' : C.sub;
   if (ch.header !== false && !b.full) {
     const chap = chapterOf(page.chapter);
     const label = chap.id === 'ouv' ? (page.name || '') : chap.name;
     box.append(h('div', { class: 'ch-head', style: { left: b.x0 + 'px', width: (b.x1 - b.x0) + 'px', color: sub } },
-      h('i', { class: 'tri', style: { borderLeftColor: ink } }),
       h('b', { style: { color: ink } }, (S.meta && S.meta.brand) || 'Sarments'),
-      h('span', null, label),
-      chap.num ? h('em', null, chap.num) : null));
+      h('span', null, (chap.num ? chap.num + '  ' : '') + label)));
   }
   if (ch.folio !== false && !b.full) {
     box.append(h('div', { class: 'ch-foot', style: { left: b.x0 + 'px', width: (b.x1 - b.x0) + 'px', color: ink } },
-      String(index + 1).padStart(2, '0')));
+      h('span', { class: 'ch-arrow' }, '↗'),
+      h('span', null, String(index + 1).padStart(2, '0'))));
   }
   return box;
 }
@@ -109,9 +109,11 @@ function renderText(d, inn, el, page, index) {
   const filled = s.box === 'sel' || s.box === 'fill';
   const surface = filled ? (s.bg || (s.box === 'sel' ? C.sel : C.card)) : (page.bg || '#FFFFFF');
   const sd = isDark(surface);
-  const tone = s.tone === 'sub' ? (sd ? '#A1A1A6' : C.sub) : s.tone === 'blue' ? (sd ? '#5AAEFF' : C.blue) : null;
-  st.color = s.col || tone || (sd ? '#F5F5F7' : C.ink);
+  const sb = isBlue(surface);
+  const tone = s.tone === 'sub' ? (sb ? '#C3CEF6' : sd ? '#9A9A9A' : C.sub) : s.tone === 'blue' ? (sb ? '#FFFFFF' : sd ? '#7C97FF' : C.blue) : null;
+  st.color = s.col || tone || (sd ? '#FFFFFF' : C.ink);
   if (sd) d.classList.add('on-dark');
+  if (sb) d.classList.add('on-blue');
   if (filled) {
     d.classList.add('box-' + s.box);
     st.backgroundColor = surface;
@@ -127,6 +129,7 @@ function renderText(d, inn, el, page, index) {
     st.justifyContent = el.va === 'middle' ? 'center' : el.va === 'bottom' ? 'flex-end' : 'flex-start';
   }
   inn.className = 'in tx';
+  if (el.cols > 1) { inn.style.columnCount = el.cols; inn.style.columnGap = (el.colGap || 48) + 'px'; }
   inn.innerHTML = el.toc ? tocHTML(el) : (el.html || '');
 }
 
