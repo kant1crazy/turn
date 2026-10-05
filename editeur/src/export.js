@@ -414,6 +414,19 @@ function drawText(ctx, el, node, x, y, w, hh) {
   drawBlockRules(ctx, node);
   drawInlineBoxes(ctx, node);
   drawWords(ctx, node);
+  drawLinks(ctx, node);
+}
+/* Liens cliquables dans le PDF, posés sur chaque ligne du lien. */
+function drawLinks(ctx, root) {
+  const pr = ctx.pr;
+  for (const a of root.querySelectorAll('a[href]')) {
+    const url = a.getAttribute('href');
+    if (!/^https?:\/\//i.test(url)) continue;
+    for (const r of a.getClientRects()) {
+      if (r.width < 1) continue;
+      ctx.pdf.link(MM(r.left - pr.left), MM(r.top - pr.top), MM(r.width), MM(r.height), { url });
+    }
+  }
 }
 /* Filets de séparation portés par les paragraphes (lignes de liste, sommaire). */
 function drawBlockRules(ctx, root) {

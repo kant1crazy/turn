@@ -1022,7 +1022,7 @@ function exitCrop() {
 }
 
 /* ---------------------------------------------------------------- édition de texte */
-const ALLOWED = { P: ['li', 'ind', 'tight', 'k', 'g', 't', 'n', 's', 'row', 'first', 'end', 'acc', 'green', 'brown', 'ar', 'kb'], BR: [], B: [], STRONG: [], I: [], EM: [], MARK: ['sel'], SPAN: ['tag', 'up', 'down', 'mix', 'warn', 'pill', 's', 'acc', 'green', 'brown', 'hl', 'kbar'] };
+const ALLOWED = { P: ['li', 'ind', 'tight', 'k', 'g', 't', 'n', 's', 'row', 'first', 'end', 'acc', 'green', 'brown', 'ar', 'kb'], BR: [], B: [], STRONG: [], I: [], EM: [], MARK: ['sel'], A: ['lk'], SPAN: ['tag', 'up', 'down', 'mix', 'warn', 'pill', 's', 'acc', 'green', 'brown', 'hl', 'kbar'] };
 function sanitizeHTML(html) {
   const box = document.createElement('div');
   box.innerHTML = html;
@@ -1052,8 +1052,14 @@ function sanitizeHTML(html) {
         continue;
       }
       const cls = (ch.getAttribute('class') || '').split(/\s+/).filter(c => ALLOWED[tag].includes(c));
+      const href = tag === 'A' ? (ch.getAttribute('href') || '').trim() : '';
       for (const a of [...ch.attributes]) ch.removeAttribute(a.name);
       if (cls.length) ch.setAttribute('class', cls.join(' '));
+      // liens : seulement http(s), ouverts dans un nouvel onglet
+      if (tag === 'A') {
+        if (!/^https?:\/\//i.test(href)) { walk(ch); const f = document.createDocumentFragment(); while (ch.firstChild) f.append(ch.firstChild); ch.replaceWith(f); continue; }
+        ch.setAttribute('href', href); ch.setAttribute('target', '_blank'); ch.setAttribute('rel', 'noopener');
+      }
       if (tag === 'MARK' && !cls.includes('sel')) ch.className = 'sel';
       walk(ch);
     }

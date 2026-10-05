@@ -52,7 +52,7 @@ def bundle(private):
         f'const FONTCOV = {json.dumps(cov, separators=(",", ":"))};\n'
         + ''.join(f'const {k}SIG = {json.dumps(v, ensure_ascii=False, separators=(",", ":"))};\n' for k, v in sigs.items())
         + js +
-        '\nwindow.__ed = { S, SAVE, FAM, buildPDF, buildDossier, renderPage, goPage, startPresent, stopPresent, flushSave, createFromTemplate, sanitizeHTML, checkTemplateUpdate, pageSig, LAYOUTS, PAGE };\n'
+        '\nwindow.__ed = { S, SAVE, FAM, buildPDF, buildDossier, renderPage, goPage, startPresent, stopPresent, flushSave, createFromTemplate, sanitizeHTML, checkTemplateUpdate, pageSig, LAYOUTS, PAGE,\n  tpl: { T, I, IG, FRAME, R, ELL, TTL, LEAD, ITEM, KEEP, KEEPB, K, TT, AR, ROWS, ARROWS, PILLS, LI, natH, natW, below, atBottom, uid, N2, C, X3, X4, X5, W3, W4, W5, ML, YT, YC, YC1, YB, BLUE, BLACK, typo } };\n'
         'boot().catch(e => { console.error(e); const o = document.getElementById("onboard"); if (o) { o.hidden = false; o.textContent = "Erreur au démarrage : " + (e && e.message || e); } });\n'
         '})();\n'
     )

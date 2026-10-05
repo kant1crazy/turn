@@ -51,6 +51,9 @@
 .pg .st-cover .tx p + p, .pg .st-h1 .tx p + p, .pg .st-h2 .tx p + p, .pg .st-num .tx p + p { margin-top: 0; }
 .pg .tx p.tight + p, .pg .tx p + p.tight { margin-top: 0.18em; }
 .pg .tx b, .pg .tx strong { font-weight: 600; }
+/* liens : en couleur d'accent ; cliquables en présentation et dans le PDF seulement */
+.pg .tx a { color: var(--kc); font-weight: 600; text-decoration: none; }
+.pg:not(.mode-present) .tx a { pointer-events: none; }
 .pg .tx i, .pg .tx em { font-style: italic; }
 .pg .tx [contenteditable] { outline: none; }
 
