@@ -1,0 +1,13 @@
+{
+  "id": "ville-bordeaux",
+  "fichier": "ville-bordeaux.mp4",
+  "duree_s": 66.07,
+  "legende": "Si t'habites à Bordeaux, compte un point à chaque fois que c'est vrai : chocolatine, miroir d'eau, tram, pont Chaban… Écris ton score sur 8 en commentaire !",
+  "hashtags": ["#bordeaux", "#bordelais", "#chocolatine", "#gironde", "#pourtoi"],
+  "faits_non_verifies": [
+    "« On va au Bassin » sans préciser Arcachon : usage tenu pour courant, non confirmé par une source écrite.",
+    "Rue Sainte-Catherine bondée le samedi après-midi et détour par les petites rues : vécu supposé, pas une donnée (la longueur de 1,2 km est confirmée).",
+    "Pont Chaban-Delmas : levées bloquées par une panne de câble en juillet 2026, reprise non confirmée ; le fait est formulé au passé."
+  ],
+  "notes": "Son non écouté : contrôle par relecture automatique uniquement, aucune ligne signalée, mais « Cannelé » a été transcrit « Kanley » : à vérifier à l'oreille. Le miroir d'eau ne fonctionne que d'avril à octobre. Aucun logo à l'écran."
+}
