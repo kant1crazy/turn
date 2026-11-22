@@ -1,0 +1,5 @@
+# sherpa-onnx 2.x n'embarque plus la phonétisation française : rester en 1.12.x
+sherpa-onnx==1.12.40
+numpy
+scipy
+soundfile

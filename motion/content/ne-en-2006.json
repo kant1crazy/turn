@@ -1,0 +1,143 @@
+{
+  "id": "ne-en-2006",
+  "title": "Si t'es né en 2006",
+  "notes": "Balisage : [affiché|prononcé] quand l'orthographe à l'écran diffère de ce que la voix doit lire ; « / » = césure de sous-titre.",
+  "voice": { "engine": "kokoro", "speaker": 30, "speed": 1.06 },
+  "music": true,
+  "scenes": [
+    {
+      "id": "hook",
+      "lines": [
+        { "id": "hook.a", "text": "Si t'es né / en [2006,|deux mille six,] / compte un point / à chaque fois / que c'est vrai." },
+        { "id": "hook.b", "text": "À moins de cinq, / t'as menti / sur ton âge." }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "hook.a", "gain": 0.9 },
+        { "name": "pop", "at": "hook.a#compte" },
+        { "name": "stamp", "at": "hook.b#menti" }
+      ]
+    },
+    {
+      "id": "spinner",
+      "point": { "at": "spinner.d" },
+      "lines": [
+        { "id": "spinner.a", "kind": "riddle", "text": "En [CM2,|cé ème deux,] / t'avais un objet / qui tournait / entre tes doigts…" },
+        { "id": "spinner.b", "kind": "reveal", "text": "Le [hand|hannd] [spinner.|spineur.]" },
+        { "id": "spinner.c", "text": "Ne mens pas." },
+        { "id": "spinner.d", "text": "Et un point." }
+      ]
+    },
+    {
+      "id": "pokemon",
+      "point": { "at": "pokemon.b#sur", "offset": 0.1 },
+      "lines": [
+        { "id": "pokemon.a", "kind": "riddle", "text": "L'été d'avant, / tu marchais / dans la rue / en fixant / un téléphone / qui n'était pas / le tien…" },
+        { "id": "pokemon.b", "kind": "reveal", "text": "Pokémon [GO,|go,] / sur celui / de ta mère." }
+      ]
+    },
+    {
+      "id": "fortnite",
+      "point": { "at": "fortnite.b", "offset": 0.55 },
+      "lines": [
+        { "id": "fortnite.a", "kind": "riddle", "text": "Le jeu sorti / pile à ton entrée / en sixième…" },
+        { "id": "fortnite.b", "kind": "reveal", "text": "[Fortnite.|Fortnaïte.]", "gap": 0.42 },
+        { "id": "fortnite.c", "text": "Et oui, / t'as dansé / dans la cour." }
+      ]
+    },
+    {
+      "id": "mondial",
+      "point": { "at": "mondial.b#championne", "offset": 0.25 },
+      "lines": [
+        { "id": "mondial.a", "kind": "riddle", "text": "L'été suivant, / tout le monde / est sorti / dans la rue / en hurlant…" },
+        { "id": "mondial.b", "kind": "reveal", "text": "La France / championne / du monde." },
+        { "id": "mondial.c", "text": "Et t'as crié / comme si / t'avais marqué." }
+      ]
+    },
+    {
+      "id": "relance",
+      "lines": [
+        { "id": "relance.a", "text": "Jusque-là, / c'était facile." },
+        { "id": "relance.b", "text": "Les quatre suivants, / c'est là / que ça se joue." }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "relance.a#facile", "gain": 0.8 },
+        { "name": "pop", "at": "relance.b", "offset": 0.05 },
+        { "name": "pop", "at": "relance.b", "offset": 0.15 },
+        { "name": "pop", "at": "relance.b", "offset": 0.25 },
+        { "name": "pop", "at": "relance.b", "offset": 0.35 }
+      ]
+    },
+    {
+      "id": "confinement",
+      "point": { "at": "confinement.c#caméra", "offset": 0.3 },
+      "lines": [
+        { "id": "confinement.a", "kind": "riddle", "text": "En quatrième, / on t'a promis / quinze jours / à la maison…" },
+        { "id": "confinement.b", "kind": "reveal", "text": "Ça a duré / deux mois." },
+        { "id": "confinement.c", "text": "En pyjama, / caméra coupée." }
+      ],
+      "sfx": [
+        { "name": "pop", "at": "confinement.a#quinze" },
+        { "name": "tick", "at": "confinement.c#caméra" }
+      ]
+    },
+    {
+      "id": "brevet",
+      "point": { "at": "brevet.b", "offset": 0.55 },
+      "lines": [
+        { "id": "brevet.a", "kind": "riddle", "text": "Ton brevet, / tu l'as passé / avec un truc / sur le visage…" },
+        { "id": "brevet.b", "kind": "reveal", "text": "Le masque.", "gap": 0.3 },
+        { "id": "brevet.c", "text": "T'es la seule / génération / à l'avoir vécu." }
+      ],
+      "sfx": [
+        { "name": "stamp", "at": "brevet.c#seule" }
+      ]
+    },
+    {
+      "id": "majorite",
+      "point": { "at": "majorite.c#Paris", "offset": 0.25 },
+      "lines": [
+        { "id": "majorite.a", "kind": "riddle", "text": "Tes [18|dix-huit] ans, / tu les as eus / la même année / que deux choses…", "gap": 0.34 },
+        { "id": "majorite.b", "kind": "reveal", "text": "Le bac…", "gap": 0.3 },
+        { "id": "majorite.c", "kind": "reveal", "text": "Et les Jeux / olympiques / de Paris." }
+      ],
+      "sfx": [
+        { "name": "pop", "at": "majorite.a#deux" }
+      ]
+    },
+    {
+      "id": "iphone",
+      "point": { "at": "iphone.c", "offset": 0.75 },
+      "lines": [
+        { "id": "iphone.a", "kind": "riddle", "text": "Et t'es plus vieux / qu'un objet / que t'as sûrement / dans la main…" },
+        { "id": "iphone.b", "kind": "reveal", "text": "[L'iPhone.|L'aïfone.]" },
+        { "id": "iphone.c", "text": "Sorti en [2007.|deux mille sept.]" }
+      ]
+    },
+    {
+      "id": "cta",
+      "lines": [
+        { "id": "cta.a", "text": "Écris ton score / en commentaire." }
+      ],
+      "sfx": [
+        { "name": "typing", "at": "cta.a", "offset": 0.35 }
+      ]
+    },
+    {
+      "id": "punch",
+      "lines": [
+        { "id": "punch.a", "text": "Mais avant, / le dernier.", "gap": 0.22 },
+        { "id": "punch.b", "text": "Celui qui / fait mal.", "gap": 0.5 },
+        { "id": "punch.c", "kind": "reveal", "text": "Pokémon [GO,|go,] / c'était il y a / dix [ans.|ans !]", "gap": 0.45 },
+        { "id": "punch.d", "text": "Et ça, / tu le réalises / seulement…", "gap": 0.0 }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "punch.a#dernier", "gain": 0.9 },
+        { "name": "stamp", "at": "punch.b#mal" },
+        { "name": "riser", "at": "punch.c", "offset": -0.48, "dur": 0.48 },
+        { "name": "roll", "at": "punch.c#c'était", "dur": 0.7 },
+        { "name": "impact", "at": "punch.c#dix", "gain": 1.0 },
+        { "name": "riser", "at": "punch.d#seulement", "offset": 0.1, "dur": 0.75, "gain": 0.7 }
+      ]
+    }
+  ]
+}

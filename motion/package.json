@@ -1,0 +1,25 @@
+{
+  "name": "motion",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Vidéos TikTok en motion design générées par code (Remotion)",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "audio": "python3 tools/build_audio.py",
+    "render": "node tools/render.mjs",
+    "still": "node tools/still.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource/anton": "^5.3.0",
+    "@remotion/bundler": "^4.0.545",
+    "@remotion/cli": "^4.0.545",
+    "@remotion/fonts": "^4.0.545",
+    "@remotion/renderer": "^4.0.545",
+    "@types/react": "^18.3.31",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.545",
+    "typescript": "^7.0.2"
+  }
+}
