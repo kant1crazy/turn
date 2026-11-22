@@ -1,0 +1,152 @@
+{
+  "id": "ne-en-2008",
+  "title": "Si t'es né en 2008",
+  "notes": "Balisage : [affiché|prononcé] quand l'orthographe à l'écran diffère de ce que la voix doit lire ; « / » = césure de sous-titre. Repères : CP en septembre 2014, CM2 en 2018-2019, sixième en 2019-2020, troisième en 2022-2023, bac en juin 2026. Publication fin novembre 2026.",
+  "voice": { "engine": "kokoro", "speaker": 30, "speed": 1.06 },
+  "music": true,
+  "scenes": [
+    {
+      "id": "hook",
+      "lines": [
+        { "id": "hook.a", "text": "Si t'es né / en [2008,|deux mille huit,] / compte un point / à chaque fois / que c'est vrai." },
+        { "id": "hook.b", "text": "En dessous de cinq, / t'es né en / [2009.|deux mille neuf.]" }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "hook.a", "gain": 0.9 },
+        { "name": "pop", "at": "hook.a#compte" },
+        { "name": "stamp", "at": "hook.b#2009" }
+      ]
+    },
+    {
+      "id": "reine",
+      "point": { "at": "reine.d" },
+      "lines": [
+        { "id": "reine.a", "kind": "riddle", "text": "À cinq ans, / t'as chanté / la même chanson / tous les jours, / pendant un an…" },
+        { "id": "reine.b", "kind": "reveal", "text": "Libérée, délivrée." },
+        { "id": "reine.c", "text": "Tes parents / s'en remettent / à peine." },
+        { "id": "reine.d", "text": "Et ça fait / un point." }
+      ],
+      "sfx": [
+        { "name": "ding", "at": "reine.b", "gain": 0.7 }
+      ]
+    },
+    {
+      "id": "brawl",
+      "point": { "at": "brawl.b#heure", "offset": 0.3 },
+      "lines": [
+        { "id": "brawl.a", "text": "En [CM2,|cé ème deux,] / t'as installé / [Brawl|Brol] [Stars.|Starz.]", "gap": 0.3 },
+        { "id": "brawl.b", "text": "Et ta / dernière partie, / elle durait / une heure." }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "brawl.a#Brawl", "gain": 0.75 },
+        { "name": "roll", "at": "brawl.b#elle", "dur": 0.7 }
+      ]
+    },
+    {
+      "id": "sixieme",
+      "point": { "at": "sixieme.c#content", "offset": 0.3 },
+      "lines": [
+        { "id": "sixieme.a", "text": "En sixième, / ton dernier jour / normal, / c'était un / vendredi treize.", "gap": 0.3 },
+        { "id": "sixieme.b", "text": "Le lundi, / le collège / était fermé.", "gap": 0.26 },
+        { "id": "sixieme.c", "text": "Et sois honnête, / au début, / t'étais content." }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "sixieme.a#vendredi", "gain": 0.75 },
+        { "name": "stamp", "at": "sixieme.b#fermé" },
+        { "name": "pop", "at": "sixieme.c#content" }
+      ]
+    },
+    {
+      "id": "relance",
+      "lines": [
+        { "id": "relance.a", "text": "Trois sur [trois ?|trois ?]" },
+        { "id": "relance.b", "text": "T'emballe pas, / c'est maintenant / que ça se corse." }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "relance.a", "gain": 0.8 },
+        { "name": "riser", "at": "relance.b#c'est", "dur": 0.8, "gain": 0.7 }
+      ]
+    },
+    {
+      "id": "among",
+      "point": { "at": "among.c#toi", "offset": 0.3 },
+      "lines": [
+        { "id": "among.a", "kind": "riddle", "text": "En cinquième, / t'as accusé / ton meilleur pote / de mentir, / tous les soirs…" },
+        { "id": "among.b", "kind": "reveal", "text": "[Among|Eumonng] [Us.|Eusse.]" },
+        { "id": "among.c", "text": "Alors que / l'imposteur, / c'était toi." }
+      ],
+      "sfx": [
+        { "name": "stamp", "at": "among.c#toi" }
+      ]
+    },
+    {
+      "id": "squid",
+      "point": { "at": "squid.c#treize", "offset": 0.35 },
+      "lines": [
+        { "id": "squid.a", "text": "Ta rentrée / de quatrième, / c'était / [Squid|Skouid] [Game.|Guème.]", "gap": 0.3 },
+        { "id": "squid.b", "text": "Déconseillé / aux moins de / seize ans.", "gap": 0.26 },
+        { "id": "squid.c", "text": "T'en avais / à peine / treize." }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "squid.a#Squid", "gain": 0.75 },
+        { "name": "pop", "at": "squid.b#aux" },
+        { "name": "stamp", "at": "squid.c#treize" }
+      ]
+    },
+    {
+      "id": "chatgpt",
+      "point": { "at": "chatgpt.b#bien", "offset": 0.4 },
+      "lines": [
+        { "id": "chatgpt.a", "text": "En troisième, / un nouveau / est arrivé / en cours [d'année :|d'année :] / [ChatGPT.|Tchatte gépété.]", "gap": 0.3 },
+        { "id": "chatgpt.b", "text": "Depuis, / tes devoirs maison / sont étrangement / bien écrits." }
+      ],
+      "sfx": [
+        { "name": "typing", "at": "chatgpt.a#un", "dur": 0.9, "gain": 0.6 },
+        { "name": "impact", "at": "chatgpt.a#ChatGPT", "gain": 0.75 },
+        { "name": "typing", "at": "chatgpt.b#tes", "dur": 1.2, "gain": 0.6 }
+      ]
+    },
+    {
+      "id": "mondial",
+      "point": { "at": "mondial.c#tête", "offset": 0.3 },
+      "lines": [
+        { "id": "mondial.a", "text": "L'été de ton bac, / les Bleus / sont allés / jusqu'en / demi-finale.", "gap": 0.28 },
+        { "id": "mondial.b", "text": "Sortis un / quatorze juillet.", "gap": 0.28 },
+        { "id": "mondial.c", "text": "T'as regardé / le feu d'artifice / en faisant / la tête." }
+      ],
+      "sfx": [
+        { "name": "pop", "at": "mondial.a#les" },
+        { "name": "impact", "at": "mondial.b#quatorze", "gain": 0.8 },
+        { "name": "whoosh", "at": "mondial.c#le" },
+        { "name": "pop", "at": "mondial.c#le", "offset": 0.45 },
+        { "name": "pop", "at": "mondial.c#en", "offset": 0.1 }
+      ]
+    },
+    {
+      "id": "cta",
+      "lines": [
+        { "id": "cta.a", "text": "Balance ton score / en commentaire." }
+      ],
+      "sfx": [
+        { "name": "roll", "at": "cta.a", "offset": 0.2, "dur": 0.8 }
+      ]
+    },
+    {
+      "id": "punch",
+      "point": { "at": "punch.c#CP", "offset": 0.35 },
+      "lines": [
+        { "id": "punch.a", "text": "Mais attends, / il en reste un.", "gap": 0.22 },
+        { "id": "punch.b", "text": "Accroche-toi.", "gap": 0.5 },
+        { "id": "punch.c", "kind": "reveal", "text": "Les bébés / du confinement / sont / au [CP.|cépé !]", "gap": 0.45 },
+        { "id": "punch.d", "text": "Et ça pique, / surtout…", "gap": 0.0 }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "punch.a#il", "gain": 0.9 },
+        { "name": "stamp", "at": "punch.b" },
+        { "name": "riser", "at": "punch.c", "offset": -0.48, "dur": 0.48 },
+        { "name": "impact", "at": "punch.c#CP", "gain": 1.0 },
+        { "name": "riser", "at": "punch.d#surtout", "offset": 0.1, "dur": 0.75, "gain": 0.7 }
+      ]
+    }
+  ]
+}
