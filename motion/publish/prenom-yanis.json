@@ -1,0 +1,12 @@
+{
+  "id": "prenom-yanis",
+  "fichier": "prenom-yanis.mp4",
+  "duree_s": 68.4,
+  "legende": "Si tu t'appelles Yanis, compte tes points et écris ton score sur 8 en commentaire (et identifie le Yanis que tu connais).",
+  "hashtags": ["#prenom", "#yanis", "#situtappelles", "#prenoms"],
+  "faits_non_verifies": [
+    "« Avant les années quatre-vingt, y en avait presque pas » : appuyé par un ou deux sites secondaires seulement (quelques naissances par an jusqu'au début des années 80), pas par le fichier INSEE lui-même.",
+    "Tous les chiffres (record 2007 ≈ 4 170 naissances, ≈ 790 naissances en 2024, 63 000 à 66 000 porteurs) viennent de sites qui reprennent le fichier des prénoms de l'INSEE ; insee.fr n'était pas joignable."
+  ],
+  "notes": "Son non écouté : contrôle par reconnaissance vocale uniquement. Les surnoms « Yan » et « Yanou » et l'exemple « YANIS B. » à l'écran sont des choix à valider par l'auteur."
+}
