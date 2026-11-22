@@ -2,9 +2,13 @@ import React from "react";
 import { Composition } from "remotion";
 import { H, W } from "./theme";
 import { NeEn2006, timeline as neEn2006 } from "./videos/ne-en-2006";
+import { PrenomYanis, timeline as prenomYanis } from "./videos/prenom-yanis";
 
 /** Une ligne par vidéo : son identifiant, sa composition et sa timeline. */
-const VIDEOS = [{ id: "ne-en-2006", component: NeEn2006, timeline: neEn2006 }];
+const VIDEOS = [
+  { id: "ne-en-2006", component: NeEn2006, timeline: neEn2006 },
+  { id: "prenom-yanis", component: PrenomYanis, timeline: prenomYanis },
+];
 
 export const Root: React.FC = () => (
   <>

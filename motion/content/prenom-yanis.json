@@ -1,0 +1,162 @@
+{
+  "id": "prenom-yanis",
+  "title": "Si tu t'appelles Yanis",
+  "notes": "Balisage : [affiché|prononcé] quand l'orthographe à l'écran diffère de ce que la voix doit lire ; « / » = césure de sous-titre. Chiffres : fichier des prénoms de l'INSEE, repris par des sites secondaires et recoupés (record 2007 ≈ 4 170 naissances ; ≈ 790 en 2024 ; ≈ 63 000 à 66 000 porteurs).",
+  "voice": { "engine": "kokoro", "speaker": 30, "speed": 1.06 },
+  "music": true,
+  "scenes": [
+    {
+      "id": "hook",
+      "lines": [
+        { "id": "hook.a", "text": "Si tu t'appelles / [Yanis,|Yanisse,] / compte un point / à chaque fois / que c'est vrai." },
+        { "id": "hook.b", "text": "À moins de cinq, / c'est pas / ton vrai prénom." }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "hook.a", "gain": 0.9 },
+        { "name": "pop", "at": "hook.a#compte" },
+        { "name": "stamp", "at": "hook.b#pas" }
+      ]
+    },
+    {
+      "id": "ortho",
+      "point": { "at": "ortho.b#seul", "offset": 0.5 },
+      "lines": [
+        { "id": "ortho.a", "text": "Toute ta vie, / t'as répété / la même phrase.", "gap": 0.3 },
+        { "id": "ortho.b", "text": "[Yanis,|Yanisse,] / avec un seul [N.|ène.]" }
+      ],
+      "sfx": [
+        { "name": "pop", "at": "ortho.a" },
+        { "name": "stamp", "at": "ortho.b#seul", "gain": 0.8 }
+      ]
+    },
+    {
+      "id": "classe",
+      "point": { "at": "classe.b#deux", "offset": 0.5 },
+      "lines": [
+        { "id": "classe.a", "text": "En classe, / le prof disait / ton prénom,", "gap": 0.2 },
+        { "id": "classe.b", "text": "et vous étiez deux / à lever la main.", "gap": 0.3 },
+        { "id": "classe.c", "text": "Du coup, / t'as fini avec / l'initiale de ton nom / collée au prénom." }
+      ],
+      "sfx": [
+        { "name": "pop", "at": "classe.b#deux" },
+        { "name": "pop", "at": "classe.b#deux", "offset": 0.12 },
+        { "name": "stamp", "at": "classe.c#l'initiale", "gain": 0.6 }
+      ]
+    },
+    {
+      "id": "record",
+      "point": { "at": "record.d#point", "offset": 0.1 },
+      "lines": [
+        { "id": "record.a", "kind": "riddle", "text": "Ton prénom / a eu son / année record / en France…" },
+        { "id": "record.b", "kind": "reveal", "text": "[2007.|Deux mille sept.]" },
+        { "id": "record.c", "text": "Plus de / quatre mille / [Yanis|Yanisse] / nés en un an.", "gap": 0.25 },
+        { "id": "record.d", "text": "Si tu es né / pas loin, / prends ton point." }
+      ],
+      "sfx": [
+        { "name": "roll", "at": "record.c", "dur": 0.6 },
+        { "name": "impact", "at": "record.c#quatre", "gain": 0.7 }
+      ]
+    },
+    {
+      "id": "pseudo",
+      "point": { "at": "pseudo.b#pris", "offset": 0.3 },
+      "lines": [
+        { "id": "pseudo.a", "text": "Ton pseudo, / c'est [Yanis|Yanisse] / avec plein de chiffres / derrière.", "gap": 0.3 },
+        { "id": "pseudo.b", "text": "[Yanis|Yanisse] tout court, / c'était déjà pris." }
+      ],
+      "sfx": [
+        { "name": "typing", "at": "pseudo.a#avec", "dur": 0.9 },
+        { "name": "stamp", "at": "pseudo.b#déjà", "gain": 0.7 }
+      ]
+    },
+    {
+      "id": "relance",
+      "lines": [
+        { "id": "relance.a", "text": "Ça, c'était / l'échauffement." },
+        { "id": "relance.b", "text": "Les quatre suivants, / seuls les vrais / les ont." }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "relance.a#l'échauffement", "gain": 0.8 },
+        { "name": "pop", "at": "relance.b", "offset": 0.05 },
+        { "name": "pop", "at": "relance.b", "offset": 0.15 },
+        { "name": "pop", "at": "relance.b", "offset": 0.25 },
+        { "name": "pop", "at": "relance.b", "offset": 0.35 }
+      ]
+    },
+    {
+      "id": "surnom",
+      "point": { "at": "surnom.b#Yanou", "offset": 0.4 },
+      "lines": [
+        { "id": "surnom.a", "text": "Personne t'appelle / [Yanis|Yanisse] / en entier.", "gap": 0.3 },
+        { "id": "surnom.b", "text": "On te dit / [Yan,|Yann,] / ou / Yanou." }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "surnom.b#Yan", "gain": 0.6 },
+        { "name": "impact", "at": "surnom.b#Yanou", "gain": 0.75 }
+      ]
+    },
+    {
+      "id": "rue",
+      "point": { "at": "rue.c#téléphone", "offset": 0.4 },
+      "lines": [
+        { "id": "rue.a", "kind": "riddle", "text": "Dans la rue, / quelqu'un crie / ton prénom, / tu te retournes…" },
+        { "id": "rue.b", "kind": "reveal", "text": "C'était pour / un autre [Yanis.|Yanisse.]" },
+        { "id": "rue.c", "text": "Et t'as fait semblant / de regarder / ton téléphone." }
+      ],
+      "sfx": [
+        { "name": "whoosh", "at": "rue.a#tu" },
+        { "name": "tick", "at": "rue.c#téléphone" }
+      ]
+    },
+    {
+      "id": "age",
+      "point": { "at": "age.a#50", "offset": 0.7 },
+      "lines": [
+        { "id": "age.a", "text": "T'as jamais croisé / un [Yanis|Yanisse] / de [50|cinquante] ans.", "gap": 0.32 },
+        { "id": "age.b", "text": "Avant les années / quatre-vingt, / ton prénom, / en France, / y en avait / presque pas." }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "age.a#de", "gain": 0.75 }
+      ]
+    },
+    {
+      "id": "tonton",
+      "point": { "at": "tonton.b#tonton", "offset": 0.4 },
+      "lines": [
+        { "id": "tonton.a", "text": "Et aujourd'hui, / on le donne / cinq fois moins / qu'à l'époque.", "gap": 0.3 },
+        { "id": "tonton.b", "text": "Bientôt, / [Yanis,|Yanisse,] / ce sera / un prénom de tonton." }
+      ],
+      "sfx": [
+        { "name": "roll", "at": "tonton.a#on", "dur": 0.6 },
+        { "name": "impact", "at": "tonton.a#cinq", "gain": 0.7 },
+        { "name": "stamp", "at": "tonton.b#tonton", "gain": 0.7 }
+      ]
+    },
+    {
+      "id": "cta",
+      "lines": [
+        { "id": "cta.a", "text": "Écris ton score / en commentaire." }
+      ],
+      "sfx": [
+        { "name": "typing", "at": "cta.a", "offset": 0.35 }
+      ]
+    },
+    {
+      "id": "punch",
+      "lines": [
+        { "id": "punch.a", "text": "Mais avant, / le dernier.", "gap": 0.3 },
+        { "id": "punch.b", "text": "Vous êtes / plus de / soixante mille / [Yanis|Yanisse] / en France.", "gap": 0.4 },
+        { "id": "punch.c", "kind": "reveal", "text": "Et y a toujours / quelqu'un / pour mettre / deux [N.|ène !]", "gap": 0.45 },
+        { "id": "punch.d", "text": "Et ça, / tu le sais / seulement…", "gap": 0.0 }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "punch.a#le", "gain": 0.9 },
+        { "name": "roll", "at": "punch.b#plus", "dur": 0.7 },
+        { "name": "impact", "at": "punch.b#soixante", "gain": 0.9 },
+        { "name": "riser", "at": "punch.c", "offset": -0.4, "dur": 0.4 },
+        { "name": "impact", "at": "punch.c#deux", "gain": 1.0 },
+        { "name": "riser", "at": "punch.d#seulement", "offset": 0.1, "dur": 0.75, "gain": 0.7 }
+      ]
+    }
+  ]
+}
