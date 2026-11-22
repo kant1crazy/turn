@@ -85,12 +85,12 @@
       "lines": [
         { "id": "squid.a", "text": "Ta rentrée / de quatrième, / c'était / [Squid|Skouid] [Game.|Guème.]", "gap": 0.3 },
         { "id": "squid.b", "text": "Déconseillé / aux moins de / seize ans.", "gap": 0.26 },
-        { "id": "squid.c", "text": "T'en avais / à peine / treize." }
+        { "id": "squid.c", "text": "T'en avais / douze ou treize." }
       ],
       "sfx": [
         { "name": "impact", "at": "squid.a#Squid", "gain": 0.75 },
         { "name": "pop", "at": "squid.b#aux" },
-        { "name": "stamp", "at": "squid.c#treize" }
+        { "name": "stamp", "at": "squid.c#douze" }
       ]
     },
     {

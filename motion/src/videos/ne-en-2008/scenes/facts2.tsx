@@ -53,13 +53,13 @@ export const Among: React.FC<SceneProps> = ({ f, q }) => {
 
 // ───────────── 5. Squid Game (dit directement) ─────────────
 
-/** Rond, triangle, carré ; le titre ; la pastille « -16 » ; puis « 13 ». */
+/** Rond, triangle, carré ; le titre ; la pastille « -16 » ; puis « 12 ou 13 ». */
 export const Squid: React.FC<SceneProps> = ({ f, q }) => {
   const { start } = q.scene("squid");
   const B = q.c("squid.a#Squid");
   const dec = q.c("squid.b");
   const aux = q.c("squid.b#aux");
-  const treize = q.c("squid.c#treize");
+  const treize = q.c("squid.c#douze");
 
   const shapesOut = prog(f, B - 2, 4, Easing.in(Easing.cubic));
   const badgeOut = prog(f, treize - 3, 4, Easing.in(Easing.cubic));
@@ -107,7 +107,7 @@ export const Squid: React.FC<SceneProps> = ({ f, q }) => {
             </div>
           </At>
         )}
-        <BigWord lines={["13"]} f={f} at={treize} x={530} y={760} size={620} color={C.yellow} rotate={5} />
+        <BigWord lines={["12", "ou 13"]} f={f} at={treize} x={525} y={760} size={330} color={C.yellow} rotate={5} />
       </Shaker>
       <Flash opacity={flash(f, B) + flash(f, treize, 6, 0.6)} />
     </AbsoluteFill>

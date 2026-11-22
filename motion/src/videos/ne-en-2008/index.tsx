@@ -38,7 +38,7 @@ const HIDE: HideSpec[] = [
   { line: "among.b" },
   { line: "squid.a", from: "Squid" },
   { line: "squid.b", from: "aux" },
-  { line: "squid.c", from: "treize" },
+  { line: "squid.c", from: "douze" },
   { line: "chatgpt.a", from: "ChatGPT" },
   { line: "mondial.b", from: "quatorze" },
   { line: "punch.a", from: "il" },
