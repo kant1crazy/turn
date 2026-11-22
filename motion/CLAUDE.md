@@ -45,6 +45,24 @@ node tools/render.mjs <id>            # out/<id>.mp4, environ 4 minutes
 Ne modifier que les fichiers de sa propre vidéo : plusieurs vidéos sont produites en parallèle sur des branches séparées.
 Les briques communes (`src/components`, `src/anim.ts`, `tools/`) ne se changent que pour corriger un vrai défaut.
 
+## Livraison
+
+Une vidéo est terminée quand :
+- le MP4 a été envoyé à l'auteur dans la conversation ;
+- `motion/publish/<id>.mp4` (copie du rendu final) et `motion/publish/<id>.json` sont committés et poussés avec le code,
+  sur le modèle de `motion/publish/ne-en-2006.json` : légende, 3 à 5 hashtags, durée, faits non vérifiés.
+  C'est là que la publication vient les chercher (voir `PUBLICATION.md`).
+
+Le message final à l'auteur est court et en français : durée, faits retenus, ce qui n'a pas pu être vérifié,
+points sur lesquels on attend son retour.
+
+## Dans une session cloud
+
+- Le rendu utilise le navigateur sans interface déjà installé (détecté par `tools/common.mjs`) : n'installer ni Playwright ni Chrome.
+- Les modèles se téléchargent depuis les « releases » GitHub ; `insee.fr` et Hugging Face ne sont pas joignables.
+- On ne peut pas écouter le son : se fier à la relecture automatique de `build_audio.py` et le dire à l'auteur.
+- Lancer le rendu en arrière-plan (environ 4 minutes) et regarder des aperçus de chaque scène avant.
+
 ## Voix : pièges connus
 
 - Garder `sherpa-onnx==1.12.40` : la version 2 n'embarque plus la phonétisation française et ne produit aucun son.
