@@ -52,6 +52,9 @@ Une vidéo est terminée quand :
 - `motion/publish/<id>.mp4` (copie du rendu final) et `motion/publish/<id>.json` sont committés et poussés avec le code,
   sur le modèle de `motion/publish/ne-en-2006.json` : légende, 3 à 5 hashtags, durée, faits non vérifiés.
   C'est là que la publication vient les chercher (voir `PUBLICATION.md`).
+- `faits_non_verifies` ne contient que des affirmations vérifiables (dates, chiffres, événements) restées sans confirmation :
+  une vidéo dont cette liste n'est pas vide n'est pas programmée. Les phrases où le spectateur se reconnaît ou non
+  (« t'as dansé dans la cour ») n'y ont pas leur place. Mieux vaut remplacer un fait douteux que le signaler.
 
 Le message final à l'auteur est court et en français : durée, faits retenus, ce qui n'a pas pu être vérifié,
 points sur lesquels on attend son retour.

@@ -10,12 +10,7 @@ Elles sont réparties sur plusieurs branches du dépôt `kant1crazy/turn` : `cla
 et une branche `claude/video-<id>` par vidéo suivante.
 
 ```bash
-git fetch origin 'refs/heads/claude/*:refs/remotes/origin/claude/*'
-for b in $(git branch -r | grep 'origin/claude/'); do
-  for f in $(git ls-tree -r --name-only "$b" motion/publish 2>/dev/null); do
-    mkdir -p ~/Movies/tiktok && git show "$b:$f" > ~/Movies/tiktok/"$(basename "$f")"
-  done
-done
+motion/tools/fetch_videos.sh        # dépose tout dans ~/Movies/tiktok et liste l'état de chaque vidéo
 ```
 
 ## Règles fixées par l'auteur
