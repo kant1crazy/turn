@@ -1,15 +1,15 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { AbsoluteFill, Audio, continueRender, delayRender, staticFile, useCurrentFrame } from "remotion";
-import { Subtitles } from "../components/Subtitles";
-import { TopBar, Wipe, type WipeKind } from "../components/ui";
-import { fontsReady } from "../fonts";
-import raw from "../generated/ne-en-2006.timeline.json";
-import { Cta, Punch } from "../scenes/ending";
-import { Fortnite, Mondial, Pokemon, Spinner } from "../scenes/facts1";
-import { Brevet, Confinement, Iphone, Majorite, Relance } from "../scenes/facts2";
-import { Hook } from "../scenes/hook";
-import { C } from "../theme";
-import { makeCues, type SceneProps, type Timeline } from "../timeline";
+import { Subtitles, type HideSpec } from "../../components/Subtitles";
+import { TopBar, Wipe, type WipeKind } from "../../components/ui";
+import { fontsReady } from "../../fonts";
+import raw from "../../generated/ne-en-2006.timeline.json";
+import { C } from "../../theme";
+import { makeCues, type SceneProps, type Timeline } from "../../timeline";
+import { Cta, Punch } from "./scenes/ending";
+import { Fortnite, Mondial, Pokemon, Spinner } from "./scenes/facts1";
+import { Brevet, Confinement, Iphone, Majorite, Relance } from "./scenes/facts2";
+import { Hook } from "./scenes/hook";
 
 export const timeline = raw as Timeline;
 
@@ -26,6 +26,23 @@ const SCENES: { id: string; wipe: WipeKind; render: (p: SceneProps) => React.Rea
   { id: "iphone", wipe: "up", render: (p) => <Iphone {...p} /> },
   { id: "cta", wipe: "circle", render: (p) => <Cta {...p} /> },
   { id: "punch", wipe: "cut", render: (p) => <Punch {...p} end={timeline.durationInFrames} /> },
+];
+
+/** Passages qu'un gros mot affiche déjà à l'écran : on ne les sous-titre pas une seconde fois. */
+const HIDE: HideSpec[] = [
+  { line: "hook.a", to: "compte" },
+  { line: "spinner.b" },
+  { line: "pokemon.a", from: "Pokémon" },
+  { line: "fortnite.a", from: "Fortnite" },
+  { line: "relance.a", from: "facile" },
+  { line: "confinement.a", from: "quinze", to: "à" },
+  { line: "confinement.b", from: "deux" },
+  { line: "majorite.a", from: "tes", to: "c'était" },
+  { line: "iphone.b" },
+  { line: "iphone.c", from: "2007" },
+  { line: "punch.a", from: "le" },
+  { line: "punch.b", from: "fait" },
+  { line: "punch.c", from: "dix" },
 ];
 
 export const NeEn2006: React.FC = () => {
@@ -51,7 +68,7 @@ export const NeEn2006: React.FC = () => {
         );
       })}
       <TopBar f={f} from={q.c("hook.b")} until={timeline.durationInFrames} label="NÉ EN 2006" points={points} />
-      <Subtitles tl={timeline} f={f} />
+      <Subtitles tl={timeline} f={f} hide={HIDE} />
       <Audio src={staticFile("ne-en-2006/audio.wav")} />
     </AbsoluteFill>
   );

@@ -1,28 +1,57 @@
 import React, { useMemo } from "react";
 import { pop } from "../anim";
 import { C, TEXT } from "../theme";
-import type { Timeline, Word } from "../timeline";
+import { norm, type Line, type Timeline, type Word } from "../timeline";
 
-type Chunk = { words: Word[]; start: number; end: number };
+/**
+ * Passage à ne pas sous-titrer, parce qu'un gros mot l'affiche déjà à l'écran.
+ * `from` / `to` : débuts de mots dans la ligne (to exclu) ; sans eux, toute la ligne.
+ */
+export type HideSpec = { line: string; from?: string; to?: string };
+
+type Chunk = { words: Word[]; start: number; end: number; hidden: boolean };
+
+const hiddenRanges = (line: Line, specs: HideSpec[]) =>
+  specs
+    .filter((s) => s.line === line.id)
+    .map((s) => {
+      const a = s.from ? line.words.findIndex((w) => norm(w.t).startsWith(norm(s.from!))) : 0;
+      const b = s.to ? line.words.findIndex((w, i) => i > a && norm(w.t).startsWith(norm(s.to!))) : line.words.length;
+      if (a < 0 || b < 0) throw new Error(`sous-titre à masquer introuvable : ${JSON.stringify(s)}`);
+      return [a, b] as const;
+    });
 
 /** Regroupe les mots en blocs courts : césures manuelles (« / ») sinon 3 mots / 16 caractères. */
-const buildChunks = (tl: Timeline): Chunk[] => {
+const buildChunks = (tl: Timeline, hide: HideSpec[]): Chunk[] => {
   const chunks: Chunk[] = [];
+  for (const spec of hide) {
+    if (!tl.lines.some((l) => l.id === spec.line)) throw new Error(`ligne inconnue : ${spec.line}`);
+  }
   for (const line of tl.lines) {
     const manual = line.words.some((w) => w.b);
+    const ranges = hiddenRanges(line, hide);
     let cur: Word[] = [];
+    let first = 0;
     const flush = () => {
-      if (cur.length) chunks.push({ words: cur, start: cur[0].s, end: cur[cur.length - 1].e });
+      if (cur.length) {
+        chunks.push({
+          words: cur,
+          start: cur[0].s,
+          end: cur[cur.length - 1].e,
+          hidden: ranges.some(([a, b]) => first >= a && first < b),
+        });
+      }
       cur = [];
     };
-    for (const w of line.words) {
+    line.words.forEach((w, i) => {
       if (!manual) {
         const len = cur.reduce((n, x) => n + x.t.length + 1, 0) + w.t.length;
         if (cur.length >= 3 || (cur.length > 0 && len > 16)) flush();
       }
+      if (!cur.length) first = i;
       cur.push(w);
       if (manual ? w.b : /[,.…!?:]$/.test(w.t)) flush();
-    }
+    });
     flush();
   }
   // un bloc reste affiché jusqu'au suivant s'il enchaîne, sinon s'efface peu après la voix
@@ -33,10 +62,15 @@ const buildChunks = (tl: Timeline): Chunk[] => {
   return chunks;
 };
 
-export const Subtitles: React.FC<{ tl: Timeline; f: number; y?: number }> = ({ tl, f, y = 1345 }) => {
-  const chunks = useMemo(() => buildChunks(tl), [tl]);
+export const Subtitles: React.FC<{ tl: Timeline; f: number; y?: number; hide?: HideSpec[] }> = ({
+  tl,
+  f,
+  y = 1345,
+  hide = [],
+}) => {
+  const chunks = useMemo(() => buildChunks(tl, hide), [tl, hide]);
   const t = f / tl.fps;
-  const chunk = chunks.find((c) => t >= c.start - 0.04 && t < c.end);
+  const chunk = chunks.find((c) => !c.hidden && t >= c.start - 0.04 && t < c.end);
   if (!chunk) return null;
 
   const chars = chunk.words.reduce((n, w) => n + w.t.length + 1, -1);
@@ -61,7 +95,6 @@ export const Subtitles: React.FC<{ tl: Timeline; f: number; y?: number }> = ({ t
     >
       {chunk.words.map((w, i) => {
         const active = t >= w.s && t < w.e;
-        const spoken = t >= w.e;
         const kick = active ? pop(f, Math.round(w.s * tl.fps), { damping: 9, stiffness: 300, mass: 0.35 }) : 0;
         return (
           <span
@@ -69,8 +102,8 @@ export const Subtitles: React.FC<{ tl: Timeline; f: number; y?: number }> = ({ t
             style={{
               display: "inline-block",
               margin: "0 0.2em",
+              whiteSpace: "nowrap",
               color: active ? C.yellow : C.paper,
-              opacity: active || spoken ? 1 : 0.92,
               transform: `translateY(${-size * 0.09 * kick}px) rotate(${active ? -2 : 0}deg)`,
               WebkitTextStroke: `${Math.round(size * 0.17)}px ${C.ink}`,
               paintOrder: "stroke fill",

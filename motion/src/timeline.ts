@@ -12,7 +12,7 @@ export type Timeline = {
   lines: Line[];
 };
 
-const norm = (w: string) =>
+export const norm = (w: string) =>
   w.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]/g, "");
 
 /** Repères en images : « ligne » ou « ligne#début-de-mot ». */

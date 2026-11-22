@@ -1,9 +1,9 @@
 import React from "react";
 import { AbsoluteFill, Easing } from "remotion";
-import { clamp, glide, lerp, pop, prog, shake } from "../anim";
-import { Backdrop, BigWord, Shaker, Stamp, Tag, dotCenter } from "../components/ui";
-import { C, DISPLAY, TEXT } from "../theme";
-import type { SceneProps } from "../timeline";
+import { clamp, glide, lerp, pop, prog, shake } from "../../../anim";
+import { Backdrop, Shaker, dotCenter } from "../../../components/ui";
+import { C, DISPLAY, TEXT } from "../../../theme";
+import type { SceneProps } from "../../../timeline";
 
 /** Le titre d'ouverture. Réutilisé à la toute fin pour que la vidéo boucle sans couture. */
 export const HookTitle: React.FC<{ f: number; scale?: number; opacity?: number; x?: number; y?: number }> = ({
@@ -53,14 +53,12 @@ export const HookTitle: React.FC<{ f: number; scale?: number; opacity?: number; 
 /** Échelle du titre à l'image `f` : c'est aussi la valeur que la fin de la vidéo doit rejoindre. */
 export const hookTitleScale = (f: number) => 1 + 0.12 * Math.exp(-f / 4);
 
+/** Un seul élément à la fois : le titre, puis la pastille « +1 », puis la jauge barrée. */
 export const Hook: React.FC<SceneProps> = ({ f, q }) => {
   const compte = q.c("hook.a#compte");
-  const chaque = q.c("hook.a#chaque");
-  const que = q.c("hook.a#que");
   const B = q.c("hook.b");
   const moins = q.c("hook.b#moins");
   const menti = q.c("hook.b#menti");
-  const age = q.c("hook.b#âge");
 
   // 1. le titre, puis il file vers le bandeau du haut
   const away = glide(f, compte, 150);
@@ -71,17 +69,18 @@ export const Hook: React.FC<SceneProps> = ({ f, q }) => {
     opacity: 1 - clamp((away - 0.7) / 0.3),
   };
 
-  // 2. la pastille « +1 »
+  // 2. la pastille « +1 », qui rejoint ensuite le compteur de points
   const badgeIn = pop(f, compte, { damping: 9, stiffness: 230, mass: 0.6 });
   const badgeOut = prog(f, B - 2, 9, Easing.inOut(Easing.cubic));
   const target = dotCenter(3.5);
   const bx = lerp(540, target.x, badgeOut);
-  const by = lerp(730, target.y, badgeOut) + Math.sin((f - compte) * 0.22) * 10 * (1 - badgeOut);
+  const by = lerp(760, target.y, badgeOut) + Math.sin((f - compte) * 0.22) * 10 * (1 - badgeOut);
   const bs = badgeIn * lerp(1, 0.06, badgeOut);
   const burst = f - compte;
 
-  // 3. la jauge « moins de 5 »
+  // 3. la jauge : quatre points sur huit, puis la croix
   const s = shake(f, menti, 24);
+  const cross = pop(f, menti, { damping: 12, stiffness: 260, mass: 0.5 });
 
   return (
     <AbsoluteFill>
@@ -94,14 +93,14 @@ export const Hook: React.FC<SceneProps> = ({ f, q }) => {
             {burst < 13 &&
               Array.from({ length: 12 }, (_, i) => {
                 const a = (i / 12) * Math.PI * 2;
-                const r = 250 + burst * 22;
+                const r = 280 + burst * 22;
                 return (
                   <div
                     key={i}
                     style={{
                       position: "absolute",
                       left: 540 + Math.cos(a) * r,
-                      top: 730 + Math.sin(a) * r,
+                      top: 760 + Math.sin(a) * r,
                       width: 70,
                       height: 16,
                       marginLeft: -35,
@@ -119,10 +118,10 @@ export const Hook: React.FC<SceneProps> = ({ f, q }) => {
                 position: "absolute",
                 left: bx,
                 top: by,
-                width: 460,
-                height: 460,
-                marginLeft: -230,
-                marginTop: -230,
+                width: 520,
+                height: 520,
+                marginLeft: -260,
+                marginTop: -260,
                 borderRadius: "50%",
                 background: C.yellow,
                 transform: `scale(${bs}) rotate(${lerp(-18, -6, badgeIn)}deg)`,
@@ -131,9 +130,9 @@ export const Hook: React.FC<SceneProps> = ({ f, q }) => {
                 alignItems: "center",
                 justifyContent: "center",
                 fontFamily: DISPLAY,
-                fontSize: 290,
+                fontSize: 330,
                 color: C.ink,
-                paddingTop: 14,
+                paddingTop: 16,
                 boxSizing: "border-box",
               }}
             >
@@ -142,36 +141,6 @@ export const Hook: React.FC<SceneProps> = ({ f, q }) => {
           </>
         )}
 
-        {f < B + 4 &&
-          [
-            { text: "À CHAQUE FOIS", at: chaque, y: 1050 },
-            { text: "QUE C'EST VRAI", at: que, y: 1128 },
-          ].map((l) =>
-            f < l.at ? null : (
-              <div
-                key={l.text}
-                style={{
-                  position: "absolute",
-                  left: 0,
-                  width: 1080,
-                  top: l.y,
-                  textAlign: "center",
-                  fontFamily: TEXT,
-                  fontWeight: 800,
-                  fontSize: 64,
-                  lineHeight: 1,
-                  color: C.paper,
-                  letterSpacing: 2,
-                  transform: `translateY(${(1 - pop(f, l.at, { damping: 13 })) * 40}px)`,
-                  opacity: clamp((f - l.at + 1) / 3) * (1 - prog(f, B - 2, 5)),
-                }}
-              >
-                {l.text}
-              </div>
-            ),
-          )}
-
-        <BigWord lines={["MOINS DE 5 ?"]} f={f} at={B} y={560} size={172} shadow={C.coral} rotate={-3} />
         {f >= B &&
           Array.from({ length: 8 }, (_, i) => {
             const appear = pop(f, B + 2 + i, { damping: 10, stiffness: 260, mass: 0.5 });
@@ -183,22 +152,50 @@ export const Hook: React.FC<SceneProps> = ({ f, q }) => {
                 key={i}
                 style={{
                   position: "absolute",
-                  left: 169 + i * 106 - 46,
-                  top: 800 - 46,
-                  width: 92,
-                  height: 92,
+                  left: 148 + i * 112 - 50,
+                  top: 760 - 50,
+                  width: 100,
+                  height: 100,
                   borderRadius: "50%",
                   boxSizing: "border-box",
-                  background: filled ? C.coral : "transparent",
-                  border: `7px solid ${filled ? C.coral : "rgba(255,247,232,0.4)"}`,
+                  background: filled ? C.yellow : "transparent",
+                  border: `8px solid ${filled ? C.yellow : "rgba(255,247,232,0.4)"}`,
                   transform: `scale(${appear * bump})`,
-                  opacity: f >= menti ? 0.5 : 1,
+                  opacity: f >= menti ? 0.35 : 1,
                 }}
               />
             );
           })}
-        <Stamp text="T'as menti" f={f} at={menti} x={525} y={1010} size={158} color={C.coral} bg={C.ink} rotate={-8} />
-        <Tag text="sur ton âge" f={f} at={age} x={700} y={1170} bg={C.paper} fg={C.ink} size={46} rotate={3} />
+        {f >= menti && (
+          <div
+            style={{
+              position: "absolute",
+              left: 540,
+              top: 760,
+              width: 0,
+              height: 0,
+              transform: `rotate(-6deg) scale(${lerp(2.8, 1, cross)})`,
+              opacity: clamp((f - menti + 1) / 2),
+              filter: "drop-shadow(12px 12px 0 #6E1414)",
+            }}
+          >
+            {[45, -45].map((a) => (
+              <div
+                key={a}
+                style={{
+                  position: "absolute",
+                  left: -330,
+                  top: -46,
+                  width: 660,
+                  height: 92,
+                  borderRadius: 46,
+                  background: C.coral,
+                  transform: `rotate(${a}deg)`,
+                }}
+              />
+            ))}
+          </div>
+        )}
       </Shaker>
     </AbsoluteFill>
   );

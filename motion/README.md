@@ -23,8 +23,9 @@ Prévisualisation interactive : `npm run studio`.
 | `content/<id>.json` | Le script : scènes, répliques, pauses, bruitages, moment où le point tombe |
 | `tools/build_audio.py` | Synthèse vocale ligne par ligne, relecture par reconnaissance vocale (horodatage mot à mot + contrôle de prononciation), bruitages et musique synthétisés, mixage à −14 LUFS |
 | `src/generated/<id>.timeline.json` | Sortie du script audio : c'est elle qui cadence l'animation |
-| `src/scenes/` | Une composition par scène ; chaque animation se cale sur un repère `"ligne#mot"` |
-| `src/components/` | Briques communes : sous-titres, compteur de points, gros mots, tampons, transitions |
+| `src/videos/<id>/` | Une vidéo par dossier : sa composition et ses scènes ; chaque animation se cale sur un repère `"ligne#mot"` |
+| `src/components/` | Briques communes : sous-titres, compteur de points, gros mots, transitions |
+| `CLAUDE.md` | Les règles du format et la marche à suivre pour une nouvelle vidéo |
 
 ## Écrire le script
 

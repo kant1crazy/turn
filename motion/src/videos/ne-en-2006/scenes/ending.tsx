@@ -1,13 +1,14 @@
 import React from "react";
 import { AbsoluteFill, Easing } from "remotion";
-import { clamp, flash, lerp, pop, prog, shakes } from "../anim";
-import { Backdrop, BigWord, Flash, Shaker, Tag } from "../components/ui";
-import { C, DISPLAY, TEXT } from "../theme";
-import type { SceneProps } from "../timeline";
+import { clamp, flash, lerp, pop, prog, shakes } from "../../../anim";
+import { Backdrop, BigWord, Flash, Shaker } from "../../../components/ui";
+import { C, DISPLAY, TEXT } from "../../../theme";
+import type { SceneProps } from "../../../timeline";
 import { HookTitle, hookTitleScale } from "./hook";
 
 // ───────────── l'appel au commentaire ─────────────
 
+/** Un seul objet : le champ de commentaire qui se remplit. */
 export const Cta: React.FC<SceneProps> = ({ f, q }) => {
   const { start } = q.scene("cta");
   const A = q.c("cta.a");
@@ -21,32 +22,31 @@ export const Cta: React.FC<SceneProps> = ({ f, q }) => {
   return (
     <AbsoluteFill>
       <Backdrop color={C.indigo} f={f} pattern="stripes" tint="rgba(255,255,255,0.06)" />
-      <BigWord lines={["Ton", "score ?"]} f={f} at={start + 2} y={610} size={260} color={C.yellow} rotate={-4} />
       <div
         style={{
           position: "absolute",
-          left: 110,
-          top: 960 + (1 - card) * 700,
-          width: 820,
-          height: 200,
-          borderRadius: 46,
+          left: 95,
+          top: 760 - 120 + (1 - card) * 900,
+          width: 850,
+          height: 240,
+          borderRadius: 56,
           background: C.paper,
-          boxShadow: "14px 16px 0 rgba(13,13,18,0.3)",
+          boxShadow: "16px 18px 0 rgba(13,13,18,0.3)",
           display: "flex",
           alignItems: "center",
-          padding: "0 34px",
+          padding: "0 40px",
           boxSizing: "border-box",
-          gap: 30,
+          gap: 32,
           transform: "rotate(-2deg)",
         }}
       >
-        <div style={{ width: 116, height: 116, borderRadius: "50%", background: C.yellow, border: `8px solid ${C.ink}`, boxSizing: "border-box", flexShrink: 0 }} />
-        <div style={{ flex: 1, fontFamily: TEXT, fontWeight: 800, fontSize: 72, color: C.ink, whiteSpace: "nowrap" }}>
+        <div style={{ width: 130, height: 130, borderRadius: "50%", background: C.yellow, border: `9px solid ${C.ink}`, boxSizing: "border-box", flexShrink: 0 }} />
+        <div style={{ flex: 1, fontFamily: TEXT, fontWeight: 800, fontSize: 84, color: C.ink, whiteSpace: "nowrap" }}>
           {typed}
           <span style={{ opacity: cursor ? 1 : 0, color: C.coral }}>|</span>
         </div>
-        <div style={{ width: 116, height: 116, borderRadius: "50%", background: C.coral, flexShrink: 0, transform: `scale(${send})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <svg width={60} height={60} viewBox="0 0 60 60">
+        <div style={{ width: 130, height: 130, borderRadius: "50%", background: C.coral, flexShrink: 0, transform: `scale(${send})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <svg width={68} height={68} viewBox="0 0 60 60">
             <path d="M30 50 V12 M12 28 L30 10 L48 28" fill="none" stroke={C.paper} strokeWidth={9} strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
@@ -72,31 +72,24 @@ const Digit: React.FC<{ v: number; size: number }> = ({ v, size }) => {
   );
 };
 
+/** Chaque temps a l'écran pour lui seul : « Le dernier. », « Fait mal. », le compteur, « 10 ans », puis la boucle. */
 export const Punch: React.FC<SceneProps & { end: number }> = ({ f, q, end }) => {
-  const A = q.c("punch.a");
-  const dernier = q.c("punch.a#dernier");
-  const B = q.c("punch.b");
-  const mal = q.c("punch.b#mal");
+  const dernier = q.c("punch.a#le");
+  const mal = q.c("punch.b#fait");
   const P = q.c("punch.c");
   const cetait = q.c("punch.c#c'était");
-  const ilya = q.c("punch.c#il");
   const dix = q.c("punch.c#dix");
-  const D = q.c("punch.d");
   const seul = q.c("punch.d#seulement");
 
-  const s = shakes(f, [[dernier, 22], [mal, 30], [dix, 34]]);
-  const clear = prog(f, P - 9, 8, Easing.in(Easing.cubic));
-
   // le compteur d'années : 2016 → 2026
-  const roll = prog(f, cetait, Math.max(8, dix - cetait - 2), Easing.inOut(Easing.cubic));
+  const roll = prog(f, cetait, Math.max(8, dix - cetait - 3), Easing.inOut(Easing.cubic));
   const v = 16 + 10 * roll;
   const ones = v % 10;
   const tens = Math.floor(v / 10) + clamp(ones - 9);
-  const yearSize = 400;
-  const yearBump = f >= dix ? 1 + 0.1 * Math.exp(-(f - dix) / 4) : 1;
+  const yearSize = 420;
+  const yearOut = prog(f, dix - 2, 4, Easing.in(Easing.cubic));
 
   // la boucle : le titre d'ouverture revient pile dans l'état de la première image
-  const dim = prog(f, D + 2, 10);
   const loopIn = prog(f, end - 10, 9, Easing.out(Easing.cubic));
   const loopScale = lerp(1.5, hookTitleScale(0), prog(f, end - 10, 10, Easing.out(Easing.cubic)));
   const dots = Math.max(0, Math.floor((f - seul) / 5) % 4);
@@ -105,42 +98,33 @@ export const Punch: React.FC<SceneProps & { end: number }> = ({ f, q, end }) => 
     <AbsoluteFill>
       <Backdrop color={C.ink} f={f} pattern="rays" tint="rgba(255,214,10,0.055)" />
       <AbsoluteFill style={{ background: `radial-gradient(circle at 50% 45%, transparent 35%, ${C.coral} 130%)`, opacity: flash(f, mal, 14, 0.75) }} />
-      <Shaker s={s}>
-        {clear < 1 && (
-          <AbsoluteFill style={{ opacity: 1 - clear, transform: `scale(${1 - 0.12 * clear})` }}>
-            <Tag text="Mais avant…" f={f} at={A} x={540} y={470} bg={C.paper} fg={C.ink} size={54} rotate={-3} />
-            <BigWord lines={["Le dernier."]} f={f} at={dernier} y={650} size={215} shadow={C.coral} rotate={-3} />
-            <Tag text="Celui qui" f={f} at={B} x={540} y={830} bg={C.coral} fg={C.ink} size={56} rotate={2} />
-            <BigWord lines={["Fait mal."]} f={f} at={mal} x={512} y={1010} size={226} color={C.coral} shadow="#6E1414" rotate={3} />
-          </AbsoluteFill>
-        )}
+      <Shaker s={shakes(f, [[dernier, 22], [mal, 30], [dix, 34]])}>
+        <BigWord lines={["Le dernier."]} f={f} at={dernier} y={760} size={215} shadow={C.coral} rotate={-3} exitAt={mal - 3} />
+        <BigWord lines={["Fait mal."]} f={f} at={mal} x={520} y={760} size={250} color={C.coral} shadow="#6E1414" rotate={3} exitAt={P - 8} />
 
-        {f >= P && (
-          <AbsoluteFill style={{ opacity: lerp(1, 0.16, dim) * (1 - loopIn), transform: `scale(${1 - 0.05 * dim})` }}>
-            <Tag text="Pokémon GO" f={f} at={P} x={540} y={450} bg={C.yellow} fg={C.ink} size={66} rotate={-3} />
-            <div
-              style={{
-                position: "absolute",
-                left: 0,
-                width: 1080,
-                top: 690,
-                textAlign: "center",
-                fontFamily: DISPLAY,
-                fontSize: yearSize,
-                color: C.paper,
-                lineHeight: `${yearSize * 1.08}px`,
-                transform: `translateY(-50%) scale(${pop(f, P + 2, { damping: 11 }) * yearBump})`,
-                whiteSpace: "nowrap",
-              }}
-            >
-              <span style={{ display: "inline-block", verticalAlign: "top" }}>20</span>
-              <Digit v={tens} size={yearSize} />
-              <Digit v={ones} size={yearSize} />
-            </div>
-            <BigWord lines={["10 ans"]} f={f} at={dix} x={515} y={1075} size={300} color={C.yellow} shadow={C.coral} rotate={-4} />
-            <Tag text="il y a" f={f} at={ilya} x={270} y={905} bg={C.paper} fg={C.ink} size={56} rotate={-6} />
-          </AbsoluteFill>
+        {f >= P && yearOut < 1 && (
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              width: 1080,
+              top: 760,
+              textAlign: "center",
+              fontFamily: DISPLAY,
+              fontSize: yearSize,
+              color: C.paper,
+              lineHeight: `${yearSize * 1.08}px`,
+              transform: `translateY(-50%) scale(${pop(f, P + 2, { damping: 11 }) * (1 + 0.35 * yearOut)})`,
+              opacity: 1 - yearOut,
+              whiteSpace: "nowrap",
+            }}
+          >
+            <span style={{ display: "inline-block", verticalAlign: "top" }}>20</span>
+            <Digit v={tens} size={yearSize} />
+            <Digit v={ones} size={yearSize} />
+          </div>
         )}
+        <BigWord lines={["10 ans"]} f={f} at={dix} x={520} y={760} size={350} color={C.yellow} shadow={C.coral} rotate={-4} exitAt={seul - 3} />
 
         {f >= seul && loopIn < 1 && (
           <div
