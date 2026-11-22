@@ -1,0 +1,151 @@
+{
+  "id": "ville-bordeaux",
+  "title": "Si t'habites à Bordeaux",
+  "notes": "Balisage : [affiché|prononcé] quand l'orthographe à l'écran diffère de ce que la voix doit lire ; « / » = césure de sous-titre.",
+  "voice": { "engine": "kokoro", "speaker": 30, "speed": 1.06 },
+  "music": true,
+  "scenes": [
+    {
+      "id": "hook",
+      "lines": [
+        { "id": "hook.a", "text": "Si t'habites / à Bordeaux, / compte un point / à chaque fois / que c'est vrai." },
+        { "id": "hook.b", "text": "À moins de cinq, / t'es juste / en vacances." }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "hook.a", "gain": 0.9 },
+        { "name": "pop", "at": "hook.a#compte" },
+        { "name": "stamp", "at": "hook.b#vacances" }
+      ]
+    },
+    {
+      "id": "choco",
+      "point": { "at": "choco.b#chaque", "offset": 0.45 },
+      "lines": [
+        { "id": "choco.a", "text": "Tu dis / chocolatine.", "gap": 0.32 },
+        { "id": "choco.b", "text": "Et quand quelqu'un / dit pain au chocolat / devant toi, / tu le reprends. / À chaque fois." }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "choco.a#chocolatine", "gain": 0.75 },
+        { "name": "stamp", "at": "choco.b#reprends", "gain": 0.7 }
+      ]
+    },
+    {
+      "id": "miroir",
+      "point": { "at": "miroir.c#brume", "offset": 0.3 },
+      "lines": [
+        { "id": "miroir.a", "kind": "riddle", "text": "L'été, / tu t'es déjà / retrouvé pieds nus / dans deux centimètres / d'eau, / devant la place / de la Bourse…" },
+        { "id": "miroir.b", "kind": "reveal", "text": "Le miroir / d'eau." },
+        { "id": "miroir.c", "text": "Et t'attendais / la brume / comme un gosse." }
+      ],
+      "sfx": [
+        { "name": "whoosh", "at": "miroir.c#brume", "dur": 0.6 }
+      ]
+    },
+    {
+      "id": "tram",
+      "point": { "at": "tram.b#monde", "offset": 0.4 },
+      "lines": [
+        { "id": "tram.a", "text": "Dans le centre, / ton tram roule / sans aucun fil / au-dessus.", "gap": 0.3 },
+        { "id": "tram.b", "text": "Le premier / au monde.", "gap": 0.26 },
+        { "id": "tram.c", "text": "Et toi, / tu trouves ça / normal." }
+      ],
+      "sfx": [
+        { "name": "ding", "at": "tram.a", "offset": 0.1 },
+        { "name": "whoosh", "at": "tram.a#sans" },
+        { "name": "impact", "at": "tram.b#premier", "gain": 0.75 }
+      ]
+    },
+    {
+      "id": "gave",
+      "point": { "at": "gave.b#sac", "offset": 0.35 },
+      "lines": [
+        { "id": "gave.a", "text": "Tu dis pas / très bien. / Tu dis / gavé bien.", "gap": 0.3 },
+        { "id": "gave.b", "text": "Et à la caisse, / tu demandes / une poche. / Jamais un sac." }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "gave.a#gavé", "gain": 0.75 },
+        { "name": "pop", "at": "gave.b#une" }
+      ]
+    },
+    {
+      "id": "relance",
+      "lines": [
+        { "id": "relance.a", "text": "Là, c'était / l'échauffement." },
+        { "id": "relance.b", "text": "Les quatre suivants, / seuls les vrais / les ont." }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "relance.a#l'échauffement", "gain": 0.8 },
+        { "name": "pop", "at": "relance.b", "offset": 0.05 },
+        { "name": "pop", "at": "relance.b", "offset": 0.15 },
+        { "name": "pop", "at": "relance.b", "offset": 0.25 },
+        { "name": "pop", "at": "relance.b", "offset": 0.35 }
+      ]
+    },
+    {
+      "id": "chaban",
+      "point": { "at": "chaban.c#ville", "offset": 0.35 },
+      "lines": [
+        { "id": "chaban.a", "kind": "riddle", "text": "T'es déjà arrivé / en retard / à cause d'un pont / qui se lève / pour laisser passer / un paquebot…" },
+        { "id": "chaban.b", "kind": "reveal", "text": "Le pont / Chaban." },
+        { "id": "chaban.c", "text": "La meilleure / excuse / de la ville." }
+      ],
+      "sfx": [
+        { "name": "riser", "at": "chaban.a#qui", "dur": 0.8, "gain": 0.7 }
+      ]
+    },
+    {
+      "id": "cath",
+      "point": { "at": "cath.c#petites", "offset": 0.5 },
+      "lines": [
+        { "id": "cath.a", "text": "Le samedi / après-midi, / tu évites / la rue / Sainte-Catherine.", "gap": 0.3 },
+        { "id": "cath.b", "text": "Un bon kilomètre / de monde.", "gap": 0.26 },
+        { "id": "cath.c", "text": "Toi, tu passes / par les / petites rues." }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "cath.b", "gain": 0.75 },
+        { "name": "whoosh", "at": "cath.c#passes" }
+      ]
+    },
+    {
+      "id": "bassin",
+      "point": { "at": "bassin.b#lequel", "offset": 0.4 },
+      "lines": [
+        { "id": "bassin.a", "text": "Dès qu'il fait beau, / tu dis / on va / au Bassin.", "gap": 0.34 },
+        { "id": "bassin.b", "text": "Et personne / demande / lequel.", "gap": 0.3 },
+        { "id": "bassin.c", "text": "Sauf que / tout Bordeaux / a eu la / même idée." }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "bassin.a#au", "gain": 0.7 },
+        { "name": "pop", "at": "bassin.b#lequel" }
+      ]
+    },
+    {
+      "id": "cta",
+      "lines": [
+        { "id": "cta.a", "text": "Écris ton score / en commentaire." }
+      ],
+      "sfx": [
+        { "name": "typing", "at": "cta.a", "offset": 0.35 }
+      ]
+    },
+    {
+      "id": "punch",
+      "point": { "at": "punch.c#deux", "offset": 0.4 },
+      "lines": [
+        { "id": "punch.a", "text": "Mais avant, / le dernier.", "gap": 0.22 },
+        { "id": "punch.b", "text": "Celui qui / fâche.", "gap": 0.5 },
+        { "id": "punch.c", "kind": "reveal", "text": "Cannelé. / T'as jamais su / si ça prend / un [N|ène] / ou deux.", "gap": 0.45 },
+        { "id": "punch.d", "text": "Et tu vas / vérifier / tout de suite…", "gap": 0.0 }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "punch.a#le", "gain": 0.9 },
+        { "name": "stamp", "at": "punch.b#fâche" },
+        { "name": "riser", "at": "punch.c", "offset": -0.48, "dur": 0.48 },
+        { "name": "impact", "at": "punch.c", "gain": 1.0 },
+        { "name": "tick", "at": "punch.c#un" },
+        { "name": "tick", "at": "punch.c#ou" },
+        { "name": "riser", "at": "punch.d#tout", "offset": 0.1, "dur": 0.75, "gain": 0.7 }
+      ]
+    }
+  ]
+}
