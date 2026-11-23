@@ -1,0 +1,160 @@
+{
+  "id": "fortnite-chapitre-1",
+  "title": "Si t'as connu Fortnite au chapitre 1",
+  "notes": "Balisage : [affiché|prononcé] quand l'orthographe à l'écran diffère de ce que la voix doit lire ; « / » = césure de sous-titre.",
+  "voice": { "engine": "kokoro", "speaker": 30, "speed": 1.06 },
+  "music": true,
+  "scenes": [
+    {
+      "id": "hook",
+      "lines": [
+        { "id": "hook.a", "text": "Si t'as connu / [Fortnite|Fortnaïte] / au chapitre un, / compte un point / à chaque fois / que c'est vrai." },
+        { "id": "hook.b", "text": "À moins de cinq, / t'es arrivé / au chapitre deux." }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "hook.a", "gain": 0.9 },
+        { "name": "pop", "at": "hook.a#compte" },
+        { "name": "stamp", "at": "hook.b#arrivé" }
+      ]
+    },
+    {
+      "id": "tilted",
+      "point": { "at": "tilted.c#suivante", "offset": 0.35 },
+      "lines": [
+        { "id": "tilted.a", "text": "Tu sautais du bus / direct sur / [Tilted|Tiltèd] [Towers.|Taoueurs.]", "gap": 0.3 },
+        { "id": "tilted.b", "text": "Mort en / trente secondes.", "gap": 0.26 },
+        { "id": "tilted.c", "text": "Et tu y retournais / la partie suivante." }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "tilted.a#Tilted", "gain": 0.75 },
+        { "name": "stamp", "at": "tilted.b#trente", "gain": 0.7 }
+      ]
+    },
+    {
+      "id": "comete",
+      "point": { "at": "comete.b#Dusty", "offset": 0.7 },
+      "lines": [
+        { "id": "comete.a", "kind": "riddle", "text": "Pendant des semaines, / t'as fixé une comète / dans le ciel, / sûr qu'elle allait raser / [Tilted|Tiltèd] [Towers…|Taoueurs…]" },
+        { "id": "comete.b", "kind": "reveal", "text": "Elle est tombée / sur [Dusty|Deusti] [Depot.|Dépo.]" }
+      ],
+      "sfx": [
+        { "name": "riser", "at": "comete.b", "offset": -0.4, "dur": 0.4, "gain": 0.6 },
+        { "name": "impact", "at": "comete.b#Dusty", "gain": 0.85 }
+      ]
+    },
+    {
+      "id": "caddie",
+      "point": { "at": "caddie.b#falaise", "offset": 0.4 },
+      "lines": [
+        { "id": "caddie.a", "text": "Le tout premier / véhicule du jeu, / c'était un caddie.", "gap": 0.3 },
+        { "id": "caddie.b", "text": "Et t'as fini / en bas d'une falaise / avec ton pote dedans." }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "caddie.a#caddie", "gain": 0.7 },
+        { "name": "roll", "at": "caddie.b", "dur": 0.7 }
+      ]
+    },
+    {
+      "id": "fusee",
+      "point": { "at": "fusee.b#ciel", "offset": 0.4 },
+      "lines": [
+        { "id": "fusee.a", "text": "Un samedi de juin, / t'as lancé une partie / juste pour voir / décoller la fusée.", "gap": 0.3 },
+        { "id": "fusee.b", "text": "Elle a ouvert / une faille / dans le ciel." }
+      ],
+      "sfx": [
+        { "name": "riser", "at": "fusee.a#décoller", "dur": 0.8, "gain": 0.6 },
+        { "name": "impact", "at": "fusee.b#faille", "gain": 0.8 }
+      ]
+    },
+    {
+      "id": "relance",
+      "lines": [
+        { "id": "relance.a", "text": "Jusque-là, c'était / facile." },
+        { "id": "relance.b", "text": "Les quatre suivants, / c'est pour / les vrais." }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "relance.a#facile", "gain": 0.8 },
+        { "name": "pop", "at": "relance.b", "offset": 0.05 },
+        { "name": "pop", "at": "relance.b", "offset": 0.15 },
+        { "name": "pop", "at": "relance.b", "offset": 0.25 },
+        { "name": "pop", "at": "relance.b", "offset": 0.35 }
+      ]
+    },
+    {
+      "id": "cube",
+      "point": { "at": "cube.c#Kevin", "offset": 0.45 },
+      "lines": [
+        { "id": "cube.a", "kind": "riddle", "text": "Et puis un jour, / un énorme truc violet / est apparu / dans le désert…" },
+        { "id": "cube.b", "kind": "reveal", "text": "Un cube géant." },
+        { "id": "cube.c", "text": "Tout le monde / l'appelait / [Kevin.|Kévine.]" }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "cube.b#cube", "gain": 0.8 },
+        { "name": "pop", "at": "cube.c#Kevin" }
+      ]
+    },
+    {
+      "id": "concert",
+      "point": { "at": "concert.b#Park", "offset": 0.4 },
+      "lines": [
+        { "id": "concert.a", "text": "Ton premier concert, / tu l'as vu / depuis ta chambre.", "gap": 0.3 },
+        { "id": "concert.b", "text": "[Marshmello,|Marchmélo,] / à [Pleasant|Plézeunt] [Park.|Parc.]" }
+      ],
+      "sfx": [
+        { "name": "pop", "at": "concert.a#chambre" },
+        { "name": "impact", "at": "concert.b", "gain": 0.75 }
+      ]
+    },
+    {
+      "id": "volcan",
+      "point": { "at": "volcan.b#rien", "offset": 0.4 },
+      "lines": [
+        { "id": "volcan.a", "text": "Le jour où / le volcan a pulvérisé / [Tilted|Tiltèd] [Towers,|Taoueurs,]", "gap": 0.2 },
+        { "id": "volcan.b", "text": "t'as fait comme si / ça te faisait rien." }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "volcan.a#volcan", "gain": 0.85 },
+        { "name": "tick", "at": "volcan.b#rien" }
+      ]
+    },
+    {
+      "id": "trou",
+      "point": { "at": "trou.c#demi", "offset": 0.45 },
+      "lines": [
+        { "id": "trou.a", "kind": "riddle", "text": "Et un dimanche soir, / toute la carte / a disparu. / À la place…" },
+        { "id": "trou.b", "kind": "reveal", "text": "Un trou noir." },
+        { "id": "trou.c", "text": "Pendant un jour / et demi." }
+      ],
+      "sfx": [
+        { "name": "riser", "at": "trou.b", "offset": -0.45, "dur": 0.45, "gain": 0.6 },
+        { "name": "impact", "at": "trou.b", "gain": 0.9 }
+      ]
+    },
+    {
+      "id": "cta",
+      "lines": [
+        { "id": "cta.a", "text": "Écris ton score / en commentaire." }
+      ],
+      "sfx": [
+        { "name": "typing", "at": "cta.a", "offset": 0.35 }
+      ]
+    },
+    {
+      "id": "punch",
+      "lines": [
+        { "id": "punch.a", "text": "Mais avant, / le dernier.", "gap": 0.22 },
+        { "id": "punch.b", "text": "Celui qui / fait mal.", "gap": 0.5 },
+        { "id": "punch.c", "kind": "reveal", "text": "Le trou noir, / c'était il y a / sept [ans.|ans !]", "gap": 0.45 },
+        { "id": "punch.d", "text": "Et ça, / tu le réalises / seulement…", "gap": 0.0 }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "punch.a#le", "gain": 0.9 },
+        { "name": "stamp", "at": "punch.b#fait" },
+        { "name": "riser", "at": "punch.c", "offset": -0.48, "dur": 0.48 },
+        { "name": "roll", "at": "punch.c#c'était", "dur": 0.7 },
+        { "name": "impact", "at": "punch.c#sept", "gain": 1.0 },
+        { "name": "riser", "at": "punch.d#seulement", "offset": 0.1, "dur": 0.75, "gain": 0.7 }
+      ]
+    }
+  ]
+}
