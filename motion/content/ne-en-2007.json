@@ -1,0 +1,159 @@
+{
+  "id": "ne-en-2007",
+  "title": "Si t'es né en 2007",
+  "notes": "Balisage : [affiché|prononcé] quand l'orthographe à l'écran diffère de ce que la voix doit lire ; « / » = césure de sous-titre. Parcours sans redoublement : CP 2013-2014, CM1 2016-2017, sixième en septembre 2018, seconde 2022-2023, 17 ans en 2024, 18 ans en 2025.",
+  "voice": { "engine": "kokoro", "speaker": 30, "speed": 1.06 },
+  "music": true,
+  "scenes": [
+    {
+      "id": "hook",
+      "lines": [
+        { "id": "hook.a", "text": "Si t'es né / en [2007,|deux mille sept,] / compte un point / à chaque fois / que c'est vrai." },
+        { "id": "hook.b", "text": "À moins de cinq, / t'as menti / sur ton âge." }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "hook.a", "gain": 0.9 },
+        { "name": "pop", "at": "hook.a#compte" },
+        { "name": "stamp", "at": "hook.b#menti" }
+      ]
+    },
+    {
+      "id": "loom",
+      "point": { "at": "loom.c#famille", "offset": 0.3 },
+      "lines": [
+        { "id": "loom.a", "kind": "riddle", "text": "En [CP,|cé pé,] / t'en avais / jusqu'au coude, / de toutes / les couleurs…" },
+        { "id": "loom.b", "kind": "reveal", "text": "Les bracelets / en élastiques." },
+        { "id": "loom.c", "text": "Et t'en as offert / à toute / ta famille." }
+      ],
+      "sfx": [
+        { "name": "pop", "at": "loom.c#offert" }
+      ]
+    },
+    {
+      "id": "euro",
+      "point": { "at": "euro.b#prolongation", "offset": 0.55 },
+      "lines": [
+        { "id": "euro.a", "text": "L'été de / tes neuf ans, / la France / a perdu / la finale / de l'Euro, / à la maison.", "gap": 0.3 },
+        { "id": "euro.b", "text": "Un seul but, / en prolongation." }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "euro.a#perdu", "gain": 0.7 },
+        { "name": "stamp", "at": "euro.b", "gain": 0.7 }
+      ]
+    },
+    {
+      "id": "bottle",
+      "point": { "at": "bottle.b#repas", "offset": 0.3 },
+      "lines": [
+        { "id": "bottle.a", "text": "En [CM1,|cé ème un,] / tu lançais / ta bouteille d'eau / jusqu'à ce qu'elle / retombe debout.", "gap": 0.3 },
+        { "id": "bottle.b", "text": "Même pendant / le repas." }
+      ],
+      "sfx": [
+        { "name": "roll", "at": "bottle.a#bouteille", "dur": 0.5, "gain": 0.6 },
+        { "name": "stamp", "at": "bottle.a#debout", "gain": 0.7 },
+        { "name": "stamp", "at": "bottle.b#repas", "gain": 0.6 }
+      ]
+    },
+    {
+      "id": "tiktok",
+      "point": { "at": "tiktok.b#TikTok", "offset": 0.6 },
+      "lines": [
+        { "id": "tiktok.a", "kind": "riddle", "text": "L'été avant / ta sixième, / l'appli où / tu faisais / des playbacks / a changé de nom…" },
+        { "id": "tiktok.b", "kind": "reveal", "text": "[Musical.ly|Musicali] / est devenue / [TikTok.|tic toc.]" }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "tiktok.b#TikTok", "gain": 0.8 }
+      ]
+    },
+    {
+      "id": "relance",
+      "lines": [
+        { "id": "relance.a", "text": "Ça, c'était / l'échauffement." },
+        { "id": "relance.b", "text": "Les quatre suivants, / faut vraiment être / de [2007.|deux mille sept.]" }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "relance.a#l'échauffement", "gain": 0.8 },
+        { "name": "pop", "at": "relance.b", "offset": 0.05 },
+        { "name": "pop", "at": "relance.b", "offset": 0.15 },
+        { "name": "pop", "at": "relance.b", "offset": 0.25 },
+        { "name": "pop", "at": "relance.b", "offset": 0.35 }
+      ]
+    },
+    {
+      "id": "portable",
+      "point": { "at": "portable.b#sac", "offset": 0.3 },
+      "lines": [
+        { "id": "portable.a", "text": "Le jour où / t'es entré / au collège, / le téléphone / y a été / interdit / par la loi.", "gap": 0.3 },
+        { "id": "portable.b", "text": "Le tien / a fini éteint, / au fond du sac." }
+      ],
+      "sfx": [
+        { "name": "stamp", "at": "portable.a#interdit" },
+        { "name": "tick", "at": "portable.b#éteint" }
+      ]
+    },
+    {
+      "id": "qatar",
+      "point": { "at": "qatar.b#quand", "offset": 0.4 },
+      "lines": [
+        { "id": "qatar.a", "text": "En seconde, / tu regardais / une finale de / Coupe du monde / en plein mois / de décembre.", "gap": 0.3 },
+        { "id": "qatar.b", "text": "[Mbappé|Mbapé] marque / trois fois, / et la France / perd quand même." }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "qatar.a#décembre", "gain": 0.7 },
+        { "name": "pop", "at": "qatar.b#Mbappé" },
+        { "name": "pop", "at": "qatar.b#marque" },
+        { "name": "pop", "at": "qatar.b#trois" }
+      ]
+    },
+    {
+      "id": "permis",
+      "point": { "at": "permis.c#tremblent", "offset": 0.5 },
+      "lines": [
+        { "id": "permis.a", "kind": "riddle", "text": "L'année de / tes dix-sept ans, / une règle / a changé / pile pour toi…" },
+        { "id": "permis.b", "kind": "reveal", "text": "Le permis / à [17|dix-sept] ans." },
+        { "id": "permis.c", "text": "Tes parents / en tremblent / encore." }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "permis.b#17", "gain": 0.8 }
+      ]
+    },
+    {
+      "id": "vote",
+      "point": { "at": "vote.b#maire", "offset": 0.4 },
+      "lines": [
+        { "id": "vote.a", "text": "Et ton tout / premier vote, / c'était / en mars dernier.", "gap": 0.28 },
+        { "id": "vote.b", "text": "Pour élire / ton maire." }
+      ],
+      "sfx": [
+        { "name": "pop", "at": "vote.a#vote" },
+        { "name": "stamp", "at": "vote.b#maire", "gain": 0.7 }
+      ]
+    },
+    {
+      "id": "cta",
+      "lines": [
+        { "id": "cta.a", "text": "Écris ton score / en commentaire." }
+      ],
+      "sfx": [
+        { "name": "typing", "at": "cta.a", "offset": 0.35 }
+      ]
+    },
+    {
+      "id": "punch",
+      "lines": [
+        { "id": "punch.a", "text": "Mais avant, / le dernier.", "gap": 0.22 },
+        { "id": "punch.b", "text": "Et celui-là, / il pique.", "gap": 0.5 },
+        { "id": "punch.c", "kind": "reveal", "text": "L'année prochaine, / t'as / vingt [ans.|ans !]", "gap": 0.45 },
+        { "id": "punch.d", "text": "Et ça fait / bizarre, / surtout…", "gap": 0.0 }
+      ],
+      "sfx": [
+        { "name": "impact", "at": "punch.a#le", "gain": 0.9 },
+        { "name": "stamp", "at": "punch.b#il" },
+        { "name": "riser", "at": "punch.c", "offset": -0.48, "dur": 0.48 },
+        { "name": "roll", "at": "punch.c#prochaine", "dur": 0.7 },
+        { "name": "impact", "at": "punch.c#vingt", "gain": 1.0 },
+        { "name": "riser", "at": "punch.d#surtout", "offset": 0.1, "dur": 0.75, "gain": 0.7 }
+      ]
+    }
+  ]
+}
